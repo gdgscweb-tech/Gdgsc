@@ -111,10 +111,30 @@ router.get(
         session: false
     }),
     (req, res) => {
-        // Successful authentication, redirect to frontend with token
-        const frontendUrl = process.env.NODE_ENV === 'production' ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL;
-        const token = generateToken(req.user._id, req.user.isProfileComplete);
-        res.redirect(`${frontendUrl}/auth/callback?token=${token}`);
+        try {
+            console.log('Google OAuth callback - User:', req.user);
+            
+            // Successful authentication, redirect to frontend with token
+            const frontendUrl = process.env.NODE_ENV === 'production' ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL;
+            console.log('Frontend URL:', frontendUrl);
+            
+            if (!req.user) {
+                console.error('No user found in req.user');
+                return res.redirect(`${frontendUrl}/login?error=auth_failed`);
+            }
+            
+            const token = generateToken(req.user._id, req.user.isProfileComplete);
+            console.log('Generated token successfully');
+            
+            const redirectUrl = `${frontendUrl}/auth/callback?token=${token}`;
+            console.log('Redirecting to:', redirectUrl);
+            
+            res.redirect(redirectUrl);
+        } catch (error) {
+            console.error('Google OAuth callback error:', error);
+            const frontendUrl = process.env.NODE_ENV === 'production' ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL;
+            res.redirect(`${frontendUrl}/login?error=callback_failed`);
+        }
     }
 );
 

@@ -65,29 +65,42 @@ module.exports = function(passport) {
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
+                const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
+                
+                // First, try to find user by googleId
                 let user = await User.findOne({ googleId: profile.id });
 
                 if (user) {
-                    // Existing user, proceed normally.
-                    // Ensure isProfileComplete is correctly set for existing users too.
-                    // The User model's pre-save hook (or a dedicated method) will handle this on subsequent saves.
+                    // Existing user with googleId, proceed normally
                     if (!user.username && user.isProfileComplete) { // Edge case: if username was cleared but flag not reset
                         user.isProfileComplete = false;
                         await user.save();
                     }
                     return done(null, user);
-                } else {
-                    // NEW USER: Only provide core social data.
-                    // Let User model's pre-save hook set username to null and isProfileComplete to false.
-                    user = await User.create({
-                        googleId: profile.id,
-                        // Do NOT set username here. Let it default to null.
-                        email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null,
-                        profilePicture: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : 'https://i.ibb.co/L8G77yW/default-avatar.png',
-                        // Do NOT set isProfileComplete here. Let User model handle it.
-                    });
-                    return done(null, user);
                 }
+
+                // If no user found by googleId, check if user exists with same email
+                if (email) {
+                    user = await User.findOne({ email: email });
+                    if (user) {
+                        // User exists with same email, link the Google account
+                        user.googleId = profile.id;
+                        if (profile.photos && profile.photos.length > 0) {
+                            user.profilePicture = profile.photos[0].value;
+                        }
+                        await user.save();
+                        return done(null, user);
+                    }
+                }
+
+                // No existing user found, create new user
+                user = await User.create({
+                    googleId: profile.id,
+                    email: email,
+                    profilePicture: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : 'https://i.ibb.co/L8G77yW/default-avatar.png',
+                });
+                return done(null, user);
+                
             } catch (err) {
                 console.error('Google Auth Error:', err);
                 return done(err, null);
@@ -105,28 +118,42 @@ module.exports = function(passport) {
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
+                const email = profile.email || null; // Discord email might be null
+                
+                // First, try to find user by discordId
                 let user = await User.findOne({ discordId: profile.id });
 
                 if (user) {
-                    // Existing user, proceed normally.
-                    // Ensure isProfileComplete is correctly set for existing users too.
+                    // Existing user with discordId, proceed normally
                     if (!user.username && user.isProfileComplete) { // Edge case
                         user.isProfileComplete = false;
                         await user.save();
                     }
                     return done(null, user);
-                } else {
-                    // NEW USER: Only provide core social data.
-                    // Let User model's pre-save hook set username to null and isProfileComplete to false.
-                    user = await User.create({
-                        discordId: profile.id,
-                        // Do NOT set username here. Let it default to null.
-                        email: profile.email || null, // Discord email might be null
-                        profilePicture: profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : 'https://i.ibb.co/L8G77yW/default-avatar.png',
-                        // Do NOT set isProfileComplete here. Let User model handle it.
-                    });
-                    return done(null, user);
                 }
+
+                // If no user found by discordId, check if user exists with same email (if email is available)
+                if (email) {
+                    user = await User.findOne({ email: email });
+                    if (user) {
+                        // User exists with same email, link the Discord account
+                        user.discordId = profile.id;
+                        if (profile.avatar) {
+                            user.profilePicture = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
+                        }
+                        await user.save();
+                        return done(null, user);
+                    }
+                }
+
+                // No existing user found, create new user
+                user = await User.create({
+                    discordId: profile.id,
+                    email: email,
+                    profilePicture: profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : 'https://i.ibb.co/L8G77yW/default-avatar.png',
+                });
+                return done(null, user);
+                
             } catch (err) {
                 console.error('Discord Auth Error:', err);
                 return done(err, null);
