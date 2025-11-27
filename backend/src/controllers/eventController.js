@@ -2,45 +2,202 @@ const Event = require('../models/Event');
 const Registration = require('../models/Registration'); // Import Registration model
 const User = require('../models/User'); // Import User model
 const asyncHandler = require('express-async-handler'); // For handling async errors
+const fs = require('fs').promises;
+const axios = require('axios');
+
+// Helper function to convert image to base64
+const imageToBase64 = async (filePath) => {
+    try {
+        const imageBuffer = await fs.readFile(filePath);
+        return imageBuffer.toString('base64');
+    } catch (error) {
+        console.error('Error converting image to base64:', error);
+        return null;
+    }
+};
+
+// Helper function to download image from URL and convert to base64
+const urlToBase64 = async (url) => {
+    try {
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        return Buffer.from(response.data, 'binary').toString('base64');
+    } catch (error) {
+        console.error('Error downloading image from URL:', error);
+        return null;
+    }
+};
 
 // @desc    Create a new event
 // @route   POST /api/events
 // @access  Private/Admin
 exports.createEvent = asyncHandler(async (req, res) => {
-    // Destructure all expected fields, including the new imageUrl
-    const { name, description, date, location, pointsAwarded, isActive, imageUrl } = req.body;
+  console.log("\n🟦 CREATE EVENT HIT");
+  console.log("➡️ req.headers.content-type:", req.headers["content-type"]);
+  console.log("➡️ req.body (raw):", req.body);
+  console.log("➡️ req.file (raw):", req.file);
 
-    // Basic validation
-    if (!name || !description || !date || !location || !pointsAwarded) {
-        res.status(400);
-        throw new Error('Please enter all required event fields');
+  // Extract raw values (they will be strings coming from FormData)
+  const {
+    eventId,
+    name,
+    description,
+    date,
+    eventEndDate,
+    registrationStartDate,
+    registrationEndDate,
+    location,
+    pointsAwarded,
+    isActive,
+    customRegistrationFields,
+  } = req.body;
+
+  // --------- Basic field validation (clear messages) ----------
+  if (!name || name.trim() === "") {
+    res.status(400);
+    throw new Error("Event name is required.");
+  }
+
+  if (!description || description.trim().length < 10) {
+    res.status(400);
+    throw new Error("Description is required and must be at least 10 characters.");
+  }
+
+  if (!date || !eventEndDate || !registrationStartDate || !registrationEndDate) {
+    res.status(400);
+    throw new Error("All date fields (start, end, registration start, registration end) are required.");
+  }
+
+  // Parse dates
+  const eventDate = new Date(date);
+  const eventEnd = new Date(eventEndDate);
+  const regStart = new Date(registrationStartDate);
+  const regEnd = new Date(registrationEndDate);
+
+  if (isNaN(eventDate.getTime()) || isNaN(eventEnd.getTime()) || isNaN(regStart.getTime()) || isNaN(regEnd.getTime())) {
+    res.status(400);
+    throw new Error("One or more provided dates are invalid.");
+  }
+
+  if (eventEnd <= eventDate) {
+    res.status(400);
+    throw new Error("Event end date must be after event start date.");
+  }
+
+  if (regEnd <= regStart) {
+    res.status(400);
+    throw new Error("Registration end date must be after registration start date.");
+  }
+
+  if (regEnd > eventDate) {
+    res.status(400);
+    throw new Error("Registration must end on or before the event start date.");
+  }
+
+  // Parse pointsAwarded (should be a number and respect your schema min:1)
+  const parsedPoints = Number(pointsAwarded);
+  if (isNaN(parsedPoints) || parsedPoints < 1) {
+    res.status(400);
+    throw new Error("pointsAwarded must be a number >= 1.");
+  }
+
+  // Coerce boolean-ish isActive
+  const isActiveBool = typeof isActive === "string" ? isActive === "true" : Boolean(isActive);
+
+  // --------- Parse & sanitize customRegistrationFields safely ----------
+  let parsedCustomFields = [];
+  try {
+    if (customRegistrationFields) {
+      // If the client already sent JSON string, parse it; if it's an array (rare), keep it
+      parsedCustomFields = typeof customRegistrationFields === "string"
+        ? JSON.parse(customRegistrationFields)
+        : customRegistrationFields;
+    }
+    if (!Array.isArray(parsedCustomFields)) {
+      parsedCustomFields = [];
+    }
+  } catch (err) {
+    console.warn("⚠️ Failed to parse customRegistrationFields, defaulting to []:", err.message);
+    parsedCustomFields = [];
+  }
+
+  // Sanitize elements: keep only plain objects (don't allow weird types), optionally filter out completely empty objects
+  parsedCustomFields = parsedCustomFields
+    .filter(f => f && typeof f === "object")
+    .map(f => ({
+      fieldName: f.fieldName ? String(f.fieldName).trim() : undefined,
+      fieldLabel: f.fieldLabel ? String(f.fieldLabel).trim() : undefined,
+      fieldType: f.fieldType ? String(f.fieldType).trim() : undefined,
+      required: typeof f.required === "boolean" ? f.required : Boolean(f.required),
+      options: Array.isArray(f.options) ? f.options.map(opt => String(opt)) : [],
+      placeholder: f.placeholder ? String(f.placeholder) : undefined,
+      validation: f.validation && typeof f.validation === "object" ? f.validation : undefined,
+    }))
+    // drop entries that are completely empty (optional)
+    .filter(f => f.fieldName || f.fieldLabel || f.fieldType || (f.options && f.options.length));
+
+  console.log("🟪 Parsed custom fields:", parsedCustomFields);
+
+  // --------- Image handling (CloudinaryStorage sets secure_url / url) ----------
+  let imageUrl = "";
+  let imageBackup = "";
+  let imageMetadata = {};
+
+  if (req.file) {
+    console.log("🟣 req.file object from multer/cloudinary:", req.file);
+
+    // Cloudinary storage commonly provides secure_url and/or url
+    const cloudUrl = req.file.secure_url || req.file.url || req.file.path || "";
+    if (cloudUrl) {
+      imageUrl = cloudUrl;
+      try {
+        imageBackup = await urlToBase64(cloudUrl);
+      } catch (err) {
+        console.warn("⚠️ Failed to create base64 backup from cloud URL:", err.message);
+        imageBackup = "";
+      }
     }
 
-    // You might want to add more robust date validation here (e.g., future date)
-    const eventDate = new Date(date);
-    if (isNaN(eventDate.getTime())) {
-        res.status(400);
-        throw new Error('Invalid event date provided');
-    }
+    imageMetadata = {
+      originalName: req.file.originalname || "",
+      mimeType: req.file.mimetype || "",
+      size: req.file.size || 0,
+      uploadedAt: new Date(),
+    };
+  } else {
+    console.log("ℹ️ No file uploaded with request (req.file is undefined).");
+  }
 
-    // Optional: Validate Base64 string if necessary (e.g., check prefix 'data:image/')
-    if (imageUrl && !imageUrl.startsWith('data:image/')) {
-        res.status(400);
-        throw new Error('Invalid image format. Must be a Base64 image Data URL.');
-    }
+  // --------- Create event ----------
+  const eventPayload = {
+    eventId: eventId && eventId.trim() !== "" ? eventId.trim() : undefined,
+    name: String(name).trim(),
+    description: String(description).trim(),
+    date: eventDate,
+    eventEndDate: eventEnd,
+    registrationStartDate: regStart,
+    registrationEndDate: regEnd,
+    location: String(location).trim(),
+    pointsAwarded: parsedPoints,
+    isActive: isActiveBool,
+    imageUrl,
+    imageBackup,
+    imageMetadata,
+    customRegistrationFields: parsedCustomFields,
+  };
 
-    const event = await Event.create({
-        name,
-        description,
-        date: eventDate, // Use the validated Date object
-        location,
-        pointsAwarded,
-        isActive: isActive !== undefined ? isActive : true, // Allow admin to set, default to true
-        imageUrl, // Save the new image URL
-    });
+  console.log("🟫 Event payload to save:", {
+    ...eventPayload,
+    // don't log huge base64 in console; show length if present
+    imageBackupLength: imageBackup ? imageBackup.length : 0,
+  });
 
-    res.status(201).json(event);
+  const event = await Event.create(eventPayload);
+
+  console.log("🟧 Event created:", { id: event._id, name: event.name, imageUrl: event.imageUrl || "(none)" });
+
+  res.status(201).json(event);
 });
+
 
 // @desc    Get all events
 // @route   GET /api/events
@@ -70,7 +227,7 @@ exports.getEventById = asyncHandler(async (req, res) => {
 // @route   PUT /api/events/:id
 // @access  Private/Admin
 exports.updateEvent = asyncHandler(async (req, res) => {
-    const { name, description, date, location, pointsAwarded, isActive, imageUrl } = req.body;
+    const { eventId, name, description, date, eventEndDate, registrationStartDate, registrationEndDate, location, pointsAwarded, isActive, customRegistrationFields } = req.body;
 
     const event = await Event.findById(req.params.id);
 
@@ -82,23 +239,37 @@ exports.updateEvent = asyncHandler(async (req, res) => {
     // Store old pointsAwarded value before updating for EXP adjustment
     const oldPointsAwarded = event.pointsAwarded;
 
-    // Validate Base64 string if necessary
-    if (imageUrl && !imageUrl.startsWith('data:image/')) {
-        res.status(400);
-        throw new Error('Invalid image format. Must be a Base64 image Data URL.');
+    // Get image URL from uploaded file (if provided), otherwise keep existing
+    const imageUrl = req.file ? req.file.path : event.imageUrl;
+
+    // If new image was uploaded, create backup
+    if (req.file) {
+        const imageBackup = await urlToBase64(req.file.path);
+        event.imageBackup = imageBackup;
+        event.imageMetadata = {
+            originalName: req.file.originalname,
+            mimeType: req.file.mimetype,
+            size: req.file.size,
+            uploadedAt: new Date(),
+        };
     }
 
     // Update event fields
+    event.eventId = eventId !== undefined ? eventId : event.eventId;
     event.name = name !== undefined ? name : event.name;
     event.description = description !== undefined ? description : event.description;
     event.date = date ? new Date(date) : event.date;
+    event.eventEndDate = eventEndDate ? new Date(eventEndDate) : event.eventEndDate;
+    event.registrationStartDate = registrationStartDate ? new Date(registrationStartDate) : event.registrationStartDate;
+    event.registrationEndDate = registrationEndDate ? new Date(registrationEndDate) : event.registrationEndDate;
     event.location = location !== undefined ? location : event.location;
     // Ensure pointsAwarded is updated
     event.pointsAwarded = pointsAwarded !== undefined ? pointsAwarded : event.pointsAwarded;
     if (typeof isActive !== 'undefined') {
         event.isActive = isActive;
     }
-    event.imageUrl = imageUrl !== undefined ? imageUrl : event.imageUrl;
+    event.imageUrl = imageUrl;
+    event.customRegistrationFields = customRegistrationFields !== undefined ? JSON.parse(customRegistrationFields) : event.customRegistrationFields;
 
     const updatedEvent = await event.save();
 
@@ -122,7 +293,6 @@ exports.updateEvent = asyncHandler(async (req, res) => {
             }
         }
     }
-    // END NEW LOGIC
 
     res.status(200).json(updatedEvent);
 });

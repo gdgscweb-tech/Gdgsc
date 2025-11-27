@@ -12,6 +12,7 @@ const CompleteProfilePage = () => {
     useEffect(() => {
         // If not authenticated or profile is already complete, redirect away
         if (!loading && (!isAuthenticated || (user && user.isProfileComplete))) {
+           console.log("Authenticated : ",isAuthenticated,"User : ", user, "Profile Complete : ",user.isProfileComplete)
             if (isAuthenticated && user && user.isProfileComplete) {
                 navigate('/profile', { replace: true }); // Already set up, go to profile
             } else {
@@ -35,7 +36,7 @@ const CompleteProfilePage = () => {
         <div className="auth-container" style={{marginTop:"140px",padding:"60px"}}>
             <div className="auth-form-card">
                 <h2>Complete Your Profile</h2>
-                <p>Welcome! Please fill in the required information to complete your profile.</p>
+                <p>Welcome! Please fill in the required information to complete your profile.</p><br></br>
                 {pageError && <p className="error-message">{pageError}</p>}
                 <CompleteProfileForm setPageError={setPageError} />
             </div>

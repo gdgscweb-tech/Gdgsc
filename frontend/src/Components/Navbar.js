@@ -5,6 +5,7 @@ import "./Navbar.css"; // Import the CSS file
 
 const Navbar = () => {
   const { user, isAuthenticated, loading, logout } = useAuth();
+  console.log("Navbar User:", user); // Debugging
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {

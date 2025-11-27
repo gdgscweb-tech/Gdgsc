@@ -225,7 +225,6 @@ progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
   return (
     <>
-      {user.role === "admin" && <AdminNavbar />}
       <div className="futuristic-profile-container">
         {/* Navigation Bar */}
         <nav className="futuristic-nav">

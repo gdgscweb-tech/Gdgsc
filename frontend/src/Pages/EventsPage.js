@@ -1,226 +1,173 @@
-// frontend/src/pages/EventsPage.js
-
-import React, { useEffect, useState } from "react";
-import api from "../services/api";
-import "./EventsPage.css"; // Make sure this CSS file exists
-import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import "./EventsPage.css";
+import EventCard from "../Components/Cards/EventCard";
 import StayTuned from "./StayTuned";
-
-// --- SYNCHRONIZED HELPER FUNCTION FOR LEVELING LOGIC ---
-// IMPORTANT: This function MUST exactly match the `getExpForLevel` function
-// in your backend/src/models/User.js.
-const getExpForLevel = (level) => {
-  if (level <= 1) return 0;
-
-  const BASE_EXP_INCREMENT = 100;
-  const EXP_INCREMENT_FACTOR = 50;
-
-  let totalExpRequired = 0;
-  for (let i = 1; i < level; i++) {
-    totalExpRequired += BASE_EXP_INCREMENT + (i - 1) * EXP_INCREMENT_FACTOR;
-  }
-  return totalExpRequired;
-};
-// --- END SYNCHRONIZED HELPER FUNCTION ---
-
-
-function formatDate(isoString) {
-  const date = new Date(isoString);
-
-  const day = date.getUTCDate();
-  const month = date.toLocaleString('default', { month: 'long', timeZone: 'UTC' });
-  const year = date.getUTCFullYear();
-
-  const suffix = (n) => {
-    if (n > 3 && n < 21) return 'th';
-    switch (n % 10) {
-      case 1: return 'st';
-      case 2: return 'nd';
-      case 3: return 'rd';
-      default: return 'th';
-    }
-  };
-
-  return `${day}${suffix(day)} ${month} ${year}`;
-}
+import { AnimatePresence, motion } from "framer-motion";
 
 const EventsPage = () => {
-  const [events, setEvents] = useState([]);
+  const [ongoingEvents, setOngoingEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [registrationMessage, setRegistrationMessage] = useState("");
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const { data } = await api.get("/api/events");
-        setEvents(data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-        setError("Failed to load events.");
-        setLoading(false);
-      }
-    };
     fetchEvents();
   }, []);
 
-  const handleRegister = async (eventId) => {
-    if (!authLoading && !user) {
-      setRegistrationMessage("Please log in to register for an event.");
-      navigate("/login");
-      return;
-    }
-
+  const fetchEvents = async () => {
     try {
-      const response = await api.post(`/api/registrations/${eventId}`);
+      setLoading(true);
+      const apiUrl = process.env.REACT_APP_ENV === 'production'
+        ? process.env.REACT_APP_PROD_API_URL
+        : process.env.REACT_APP_DEV_API_URL;
 
-      setRegistrationMessage(
-        `Successfully registered for the event! EXP awarded.`
-      );
-      console.log("Registration successful:", response.data);
+      const response = await fetch(`${apiUrl}/api/events`);
 
-      setTimeout(() => {
-        setRegistrationMessage("");
-      }, 5000); // Clears message after 5 seconds
-    } catch (err) {
-      console.error(
-        "Registration error details:",
-        err.response?.data || err.message
-      );
-
-      if (err.response && err.response.data && err.response.data.message) {
-        setRegistrationMessage(
-          `Registration error: ${err.response.data.message}`
-        );
-      } else {
-        setRegistrationMessage("Failed to register for event.");
+      if (!response.ok) {
+        throw new Error('Failed to fetch events');
       }
 
-      setTimeout(() => {
-        setRegistrationMessage("");
-      }, 8000); // Clears error message after 8 seconds
+      const events = await response.json();
+      categorizeEvents(events);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const categorizeEvents = (events) => {
+    const now = new Date();
+    const ongoing = [];
+    const upcoming = [];
+    const past = [];
+
+    events.forEach(event => {
+      const eventDate = new Date(event.date);
+      const eventEndDate = event.eventEndDate ? new Date(event.eventEndDate) : new Date(eventDate.getTime() + 24 * 60 * 60 * 1000);
+
+      if (now >= eventDate && now <= eventEndDate) {
+        ongoing.push(event);
+      } else if (eventDate > now) {
+        upcoming.push(event);
+      } else {
+        past.push(event);
+      }
+    });
+
+    setOngoingEvents(ongoing);
+    setUpcomingEvents(upcoming);
+    setPastEvents(past);
+    setTotalEvents(events.length);
+  };
+
   if (loading) {
-    return <div className="events-container">Loading events...</div>;
+    return (
+      <div className="background">
+        <h1>Events Page</h1>
+        <p>Loading events...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="events-container error-message">{error}</div>;
+    return (
+      <div className="background">
+        <h1>Events Page</h1>
+        <p>Error: {error}</p>
+      </div>
+    );
   }
 
-  // If no events, show StayTuned page
-  if (events.length === 0) {
+  // If no events exist, show StayTuned page
+  if (totalEvents === 0) {
     return <StayTuned />;
   }
 
+  // Find the selected event object
+  const selectedEvent = [...ongoingEvents, ...upcomingEvents, ...pastEvents].find(e => e._id === selectedId);
+
   return (
-    <div className="events-container">
-      <h1>Available Events</h1>
-      {registrationMessage && (
-        <div
-          className={`registration-feedback ${
-            registrationMessage.includes("Successfully")
-              ? "success-message"
-              : "error-message"
-          }`}
-        >
-          {registrationMessage}
+    <div>
+      <div className="background">
+        <div className="section">
+          <h1 className="section-heading">Upcoming Events</h1>
+          <div className="cards-container">
+            {upcomingEvents.length > 0 ? (
+              upcomingEvents.map(event => (
+                <EventCard 
+                  key={event._id} 
+                  event={event} 
+                  layoutId={event._id} 
+                  onClick={() => setSelectedId(event._id)}
+                />
+              ))
+            ) : (
+              <p>No upcoming events</p>
+            )}
+          </div>
         </div>
-      )}
-      <div className="events-list">
-        {
-        events.sort((a, b) => new Date(b.date) - new Date(a.date)).map((event, index) => {
-            // Array of character icons to cycle through
-            const characterIcons = [
-              "/assets/Arcade_characters/girl.png",
-              "/assets/Arcade_characters/boy.png",
-              "/assets/Arcade_characters/warrior.png",
-              "/assets/Arcade_characters/mage.jpeg",
-            ];
-            
-            
-            // Array of event images to cycle through
-            const eventImages = [
-              "https://i.ibb.co/xt9Mspf2/orientation.png",
-              "/images/events/Game dev workshop.webp",
-              "/images/events/past_event_11.png",
-              "/images/events/past_event_22.png",
-            ];
-            
-            // Get character icon and event image based on index, cycling through available options
-            const characterIcon = characterIcons[index % characterIcons.length];
-            const defaultEventImage = eventImages[index % eventImages.length];
-            
-            return (
-              <div key={event._id} className="event-card">
-                <div className="event-image-container">
-                  {/* {event.imageUrl ? (
-                    <img
-                      src={event.imageUrl}
-                      alt={event.name}
-                      className="event-image"
-                    />
-                  ) : (
-                    <img
-                      src={defaultEventImage}
-                      alt={event.name}
-                      className="event-image"
-                    />
-                  )} */}
-                    <img
-                      src={defaultEventImage}
-                      alt={event.name}
-                      className="event-image"
-                    />
-                </div>
-                <div className="event-details">
-                  <div className="character-icon">
-                    <img src={characterIcon} alt="Character" className="character-image" />
-                  </div>
-                  <h2>{event.name}</h2>
-                  <div className="event-info">
-                    <p>
-                      <strong>📅 Date:</strong>
-                       <span style={{marginLeft:'6px'}}>{ formatDate(event.date)}</span>
-                    </p>
-                    <p>
-                      <strong>📍 Location:</strong> {event.location}
-                    </p>
-                    <p>
-                      <strong>⭐ Points:</strong> {event.pointsAwarded} EXP
-                    </p>
-                  </div>
-                  {event.isActive && new Date(event.date) > new Date() ? (
-                    <button
-                      onClick={() => handleRegister(event._id)}
-                      className="register-button"
-                    >
-                      Register Now
-                    </button>
-                  ) : (
-                    <div className="event-inactive-message">Event Inactive</div>
-                  )}
-                </div>
+
+        {ongoingEvents.length > 0 && (
+          <div className="section">
+            <h1 className="section-heading">Ongoing Events</h1>
+            <div className="cards-container">
+              {ongoingEvents.map(event => (
+                <EventCard 
+                  key={event._id} 
+                  event={event} 
+                  layoutId={event._id} 
+                  onClick={() => setSelectedId(event._id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {pastEvents.length > 0 && (
+          <div className="section">
+            <h1 className="section-heading">Past Events</h1>
+            <div className="cards-container">
+              {pastEvents.map(event => (
+                <EventCard 
+                  key={event._id} 
+                  event={event} 
+                  layoutId={event._id} 
+                  onClick={() => setSelectedId(event._id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <AnimatePresence>
+          {selectedId && selectedEvent && (
+            <>
+              <motion.div
+                className="modal-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedId(null)}
+              />
+              <div className="modal-container">
+                <EventCard 
+                  event={selectedEvent} 
+                  layoutId={selectedId} 
+                  isExpanded={true}
+                  onClick={() => {}} // Do nothing on click when expanded
+                />
               </div>
-            );
-          })}
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
 };
 
 export default EventsPage;
-
-
-
-
-
-
-
-

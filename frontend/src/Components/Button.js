@@ -1,6 +1,6 @@
 import React from "react";
 
-const Button = ({ text, variant = "hexagon", style = {} }) => {
+const Button = ({ text, variant = "hexagon", style = {}, ...props }) => {
   // Base style using JS syntax
   const baseStyle = {
     borderRadius: ".25rem",
@@ -48,7 +48,21 @@ const Button = ({ text, variant = "hexagon", style = {} }) => {
         boxShadow: "0 0 10px rgba(255, 230, 0, 0.6)",
       },
     },
+    disabled: {
+      "&:hover": {
+        cursor: "not-allowed",
+        transform: "none",
+        boxShadow: "none",
+      },
+    },
   };
+
+  if (variant === "disabled") {
+    baseStyle.backgroundImage = "none";
+    baseStyle.backgroundColor = "#555";
+    baseStyle.color = "#888";
+    baseStyle.cursor = "not-allowed";
+  }
 
   const handleMouseEvents = (e) => {
     const hover = variantStyles[variant]["&:hover"];
@@ -71,6 +85,7 @@ const Button = ({ text, variant = "hexagon", style = {} }) => {
       onMouseOut={handleMouseEvents}
       onMouseDown={handleMouseEvents}
       onMouseUp={handleMouseEvents}
+      {...props}
     >
       {variant === "star" ? (
         <span
