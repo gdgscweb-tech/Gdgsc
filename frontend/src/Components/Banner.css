@@ -1,0 +1,172 @@
+:root {
+  --color-bg-dark: #000000; /* Pure Black for background */
+}
+
+.Banner {
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+  margin: 0 30px 40px;
+  border-radius: 12px;
+}
+
+.Banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.Banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    var(--color-bg-dark) 0%,
+    rgba(3, 3, 3, 0.9) 50%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.Banner-content {
+  position: absolute;
+  top: 50%;
+  left: 60px;
+  transform: translateY(-50%);
+  z-index: 2;
+  max-width: 600px;
+}
+
+.Banner-logo h1 {
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
+}
+
+.Banner-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.Banner-item {
+  color: #ddd;
+}
+
+.Banner-dot {
+  color: #666;
+}
+
+.Banner-description {
+  color: #ccc;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.Banner-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 14px 32px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background-color: #8b5cf6;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.Banner-nav {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.Banner-nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.Banner-nav-dot.active,
+.Banner-nav-dot:hover {
+  background-color: #fff;
+  transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+  .Banner {
+    height: 500px;
+    margin: 0 20px 30px;
+  }
+
+  .Banner-content {
+    left: 30px;
+    right: 30px;
+  }
+
+  .Banner-logo h1 {
+    font-size: 40px;
+  }
+
+  .Banner-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

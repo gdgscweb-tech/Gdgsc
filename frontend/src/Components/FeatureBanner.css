@@ -1,0 +1,114 @@
+.categories {
+  padding: 0px 30px 40px;
+  margin: 0 30px;
+}
+
+.section-title {
+  margin-bottom: 30px;
+  text-shadow: 20px solid gold;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.category-card {
+  position: relative;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s outline 0.3s;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); /* Added shadow */
+  outline: 1px solid rgba(55, 65, 81, 0.5);
+  outline-offset: 0px;
+}
+
+.category-card.is-selected {
+  outline: 4px solid #6366f1; /* Indigo 500 */
+}
+.category-card.is-selected--reset {
+  outline: 4px solid #f59e0b;
+}
+.category-card--reset {
+  background-color: #111827; /* bg-gray-900 equivalent */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.category-card--reset h3 {
+  font-size: 1.25rem; /* text-xl equivalent */
+  font-weight: 700; /* font-bold equivalent */
+  color: #facc15; /* text-yellow-400 equivalent */
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+}
+
+.category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.category-card:hover img {
+  transform: scale(1.1);
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.category-overlay h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 1201px) {
+  /* Adjusted for 5 items (4 categories + SHOW ALL) on large screens */
+  .categories-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .categories {
+    padding: 0 20px 30px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .category-card {
+    height: 150px;
+  }
+}

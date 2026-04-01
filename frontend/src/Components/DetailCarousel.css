@@ -1,0 +1,78 @@
+.detail-carousel {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.detail-carousel-image-container {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.detail-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  animation: fadeIn 1s ease-in-out;
+}
+
+.detail-carousel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: linear-gradient(
+    to right,
+    var(--color-bg-dark) 0%,
+    rgba(43, 39, 39, 0.9) 50%,
+    transparent 100%
+  );
+}
+
+.detail-carousel-dots-container {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  column-gap: 0.5rem;
+}
+
+.detail-carousel-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(234, 250, 7, 0.966);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.detail-carousel-dot.is-active {
+  background-color: #f1f505;
+  /* Indigo 400 */
+  width: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .detail-carousel {
+    height: 30vh;
+  }
+}

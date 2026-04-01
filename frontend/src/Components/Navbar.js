@@ -45,7 +45,7 @@ const Navbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/stay-tuned" onClick={closeMenu}>
+          <Link to="/games" onClick={closeMenu}>
             GAMES
           </Link>
         </li>
@@ -61,24 +61,38 @@ const Navbar = () => {
         </li>
         {/* User actions are moved inside the mobile menu for small screens */}
         <li className="nav-actions-mobile">
-            {isAuthenticated && !loading ? (
-                 <>
-                    {user?.role === "admin" && (
-                        <Link to="/admin" onClick={closeMenu}>Admin</Link>
-                    )}
-                    <Link to="/profile" onClick={closeMenu}>Profile</Link>
-                    <Link to="/" onClick={() => { logout(); closeMenu(); }}>Logout</Link>
-                 </>
-            ) : (
-                <Link to="/login" onClick={closeMenu}>Login</Link>
-            )}
+          {isAuthenticated && !loading ? (
+            <>
+              {user?.role === "admin" && (
+                <Link to="/admin" onClick={closeMenu}>
+                  Admin
+                </Link>
+              )}
+              <Link to="/profile" onClick={closeMenu}>
+                Profile
+              </Link>
+              <Link
+                to="/"
+                onClick={() => {
+                  logout();
+                  closeMenu();
+                }}
+              >
+                Logout
+              </Link>
+            </>
+          ) : (
+            <Link to="/login" onClick={closeMenu}>
+              Login
+            </Link>
+          )}
         </li>
       </ul>
 
       {/* User profile / Login section for desktop */}
       <div className="user-actions">
-        {!loading && (
-          isAuthenticated ? (
+        {!loading &&
+          (isAuthenticated ? (
             <>
               {user?.role === "admin" && (
                 <Link to="/admin" className="admin-link">
@@ -87,7 +101,7 @@ const Navbar = () => {
               )}
               <Link to="/profile" className="profile-link">
                 <img
-                  src={user?.profilePicture || '/assets/default-avatar.png'} // Add a fallback avatar
+                  src={user?.profilePicture || "/assets/default-avatar.png"} // Add a fallback avatar
                   alt="profile"
                   className="profile-picture"
                 />
@@ -98,8 +112,7 @@ const Navbar = () => {
             <Link to="/login" className="login-button">
               Login
             </Link>
-          )
-        )}
+          ))}
       </div>
     </nav>
   );

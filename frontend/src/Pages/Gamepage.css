@@ -1,0 +1,13 @@
+.game {
+  min-height: 100vh;
+  background-color: #0a0a0a;
+}
+.main-content {
+  padding-top: 70px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 20px;
+  }
+}
