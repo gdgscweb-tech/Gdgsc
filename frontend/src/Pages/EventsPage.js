@@ -14,31 +14,31 @@ const EventsPage = () => {
   const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = process.env.REACT_APP_ENV === 'production'
+          ? process.env.REACT_APP_PROD_API_URL
+          : process.env.REACT_APP_DEV_API_URL;
 
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const apiUrl = process.env.REACT_APP_ENV === 'production'
-        ? process.env.REACT_APP_PROD_API_URL
-        : process.env.REACT_APP_DEV_API_URL;
+        const response = await fetch(`${apiUrl}/api/events`);
 
-      const response = await fetch(`${apiUrl}/api/events`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch events');
+        const events = await response.json();
+        categorizeEvents(events);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching events:', err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const events = await response.json();
-      categorizeEvents(events);
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching events:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchEvents();
+  },[]);
 
   const categorizeEvents = (events) => {
     const now = new Date();
@@ -47,6 +47,12 @@ const EventsPage = () => {
     const past = [];
 
     events.forEach(event => {
+      if(event.imageUrl) {
+        console.log('Event image URL:', event.imageUrl);
+      } else {
+        event.imageUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e"; // temporary image
+        //this is a temporary solution to cloudinary problem
+      }
       const eventDate = new Date(event.date);
       const eventEndDate = event.eventEndDate ? new Date(event.eventEndDate) : new Date(eventDate.getTime() + 24 * 60 * 60 * 1000);
 
