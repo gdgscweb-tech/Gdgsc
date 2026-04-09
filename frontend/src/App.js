@@ -13,7 +13,7 @@ import AdminPage from "./Pages/AdminPage";
 import MeetTeam from "./Pages/MeetTeam";
 import Gallery from "./Pages/gallery";
 import StayTuned from "./Pages/StayTuned";
-import Gamepage from "./Pages/GamePage";
+import Gamepage from "./Pages/Gamepage";
 const App = () => {
   return (
     <BrowserRouter>

@@ -90,6 +90,11 @@ app.use('/api/user', require('./src/routes/userRoutes'));
 app.use('/api/events', require('./src/routes/eventRoutes'));          // NEW
 app.use('/api/registrations', require('./src/routes/registrationRoutes')); // NEW
 
+// Serve game assets (images, downloads) from /src/games as static files
+app.use('/api/games/assets', express.static(path.join(__dirname, 'src/games')));
+
+app.use('/api/games', require('./src/routes/gamesRoutes'));               // Games & Categories
+
 
 // Serve frontend in production (if applicable)
 if (process.env.NODE_ENV === 'production') {

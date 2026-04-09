@@ -152,6 +152,66 @@
   margin-right: 0.5rem;
 }
 
+/* Disabled state for coming soon */
+.play-game-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-image: linear-gradient(90deg, #6b7280, #9ca3af) !important;
+  color: #1f2937;
+}
+
+.play-game-button--disabled:hover {
+  transform: none !important;
+}
+
+/* Platforms section */
+.platforms-section {
+  margin-bottom: 2rem;
+}
+
+.platforms-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.platform-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background-color: #374151;
+  border: 1px solid #4f46e5;
+  border-radius: 9999px;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.platform-chip:hover {
+  background-color: #4f46e5;
+  color: #ffffff;
+}
+
+/* Banner platform badges */
+.Banner-platforms {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.platform-badge {
+  padding: 0.25rem 0.75rem;
+  background-color: rgba(79, 70, 229, 0.6);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  color: #e5e7eb;
+  backdrop-filter: blur(4px);
+}
+
 @media (max-width: 1280px) {
   header-content-wrapper {
     padding: 0 1rem;

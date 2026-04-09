@@ -27,23 +27,39 @@
 }
 
 .category-card.is-selected {
-  outline: 4px solid #6366f1; /* Indigo 500 */
+  outline: 2px solid rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 .category-card.is-selected--reset {
-  outline: 4px solid #f59e0b;
+  outline: 2px solid rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 .category-card--reset {
-  background-color: #111827; /* bg-gray-900 equivalent */
+  background: rgba(15, 15, 15, 0.8);
+  border: 1px solid rgba(255, 215, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
 
+/* Subtle gold line on top to match other cards */
+.category-card--reset::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+}
+
 .category-card--reset h3 {
-  font-size: 1.25rem; /* text-xl equivalent */
-  font-weight: 700; /* font-bold equivalent */
-  color: #facc15; /* text-yellow-400 equivalent */
+  font-family: 'Valorax', sans-serif;
+  font-size: 1.25rem;
+  color: #ffd700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .category-card:hover {

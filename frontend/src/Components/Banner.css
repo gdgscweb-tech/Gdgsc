@@ -4,10 +4,10 @@
 
 .Banner {
   position: relative;
-  height: 600px;
+  aspect-ratio: 21 / 9; /* Ultrawide cinematic — prepare images at 2100×900 or 2520×1080 */
   overflow: hidden;
-  margin: 0 30px 40px;
-  border-radius: 12px;
+  margin: 0;
+  border-radius: 0;
 }
 
 .Banner-image {
@@ -148,8 +148,8 @@
 
 @media (max-width: 768px) {
   .Banner {
-    height: 500px;
-    margin: 0 20px 30px;
+    aspect-ratio: 16 / 9; /* Standard widescreen on mobile */
+    margin: 0;
   }
 
   .Banner-content {

@@ -251,6 +251,7 @@ const createRegistrations = async (users, events) => {
   return createdRegistrations;
 };
 
+
 // Main seeding function
 const seedDatabase = async () => {
   try {

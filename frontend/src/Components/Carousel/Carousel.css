@@ -1,91 +1,115 @@
-@keyframes autoRun3d {
-  from {
-    transform: perspective(1000px) rotateY(-360deg); /* Slightly deeper perspective */
-  }
-  to {
-    transform: perspective(1000px) rotateY(0deg);
-  }
-}
+/* ===== Marquee Carousel - Premium Gold Theme ===== */
 
-.card-3d {
+.carousel-container {
   position: relative;
-  width: 100%;
-  height: 300px; /* Increased height */
-  transform-style: preserve-3d;
-  transform: perspective(1000px);
-  animation: autoRun3d 40s linear infinite;
-  will-change: transform;
-}
-
-.card-3d div {
-  position: absolute;
-  width: 250px; /* Increased width */
-  height: 160px; /* Adjusted height for landscape */
-  background-color: rgb(199, 199, 199);
-  border: solid 2px lightgray;
-  border-radius: 0.5rem;
-  overflow: hidden; /* So images don't spill */
-  top: 50%;
+  width: 100vw; /* Take full viewport width */
   left: 50%;
-  background: linear-gradient(to bottom right, #fff, #ccc);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  filter: brightness(1); /* keep it consistent */
-  transform-origin: center center;
-  will-change: transform, filter;
+  transform: translateX(-50%); /* Centering trick to break out of container */
+  overflow: hidden;
+  padding: 40px 0;
+  margin: 0;
 }
 
-.card-3d div img {
+/* Gradients on edges for fade out */
+.carousel-fade-left,
+.carousel-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15vw;
+  z-index: 10;
+  pointer-events: none; /* Let clicks pass through */
+}
+
+.carousel-fade-left {
+  left: 0;
+  background: linear-gradient(to right, #000000, transparent);
+}
+
+.carousel-fade-right {
+  right: 0;
+  background: linear-gradient(to left, #000000, transparent);
+}
+
+.carousel-track {
+  display: flex;
+  width: max-content;
+  /* Scroll entirely by translating half its total width */
+  animation: marqueeScroll 45s linear infinite;
+  padding-left: 0;
+}
+
+.carousel-images {
+  display: flex;
+  gap: 30px;
+  padding-right: 30px; /* Space between the two blocks */
+}
+
+/* The card framing the image */
+.carousel-card {
+  width: 380px;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: rgba(15, 15, 15, 0.8);
+  position: relative;
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Subtle gold line on top */
+.carousel-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+  z-index: 2;
+}
+
+/* Add depth on hover, but DOES NOT PAUSE the marquee */
+.carousel-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.15);
+  z-index: 5;
+}
+
+.carousel-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.6s ease, filter 0.6s ease;
+  filter: brightness(0.8) contrast(1.15) grayscale(0.2);
 }
 
-.card-3d:hover {
-  animation-play-state: paused !important;
+/* Make hovered image vibrant, scale slightly */
+.carousel-card:hover img {
+  transform: scale(1.08);
+  filter: brightness(1.1) contrast(1.1) grayscale(0);
 }
 
-.card-3d:hover div {
-  animation-play-state: paused !important;
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Translate exactly half the width since we have 2 equal blocks side by side */
+    transform: translateX(-50%);
+  }
 }
 
-/* Increase spacing: 360 / 10 = 36deg, you can make it 40deg to add gap */
-.card-3d div:nth-child(1) {
-  transform: translate(-50%, -50%) rotateY(0deg) translateZ(400px);
-  animation-delay: -0s;
-}
-.card-3d div:nth-child(2) {
-  transform: translate(-50%, -50%) rotateY(36deg) translateZ(400px);
-  animation-delay: -2s;
-}
-.card-3d div:nth-child(3) {
-  transform: translate(-50%, -50%) rotateY(72deg) translateZ(400px);
-  animation-delay: -4s;
-}
-.card-3d div:nth-child(4) {
-  transform: translate(-50%, -50%) rotateY(108deg) translateZ(400px);
-  animation-delay: -6s;
-}
-.card-3d div:nth-child(5) {
-  transform: translate(-50%, -50%) rotateY(144deg) translateZ(400px);
-  animation-delay: -8s;
-}
-.card-3d div:nth-child(6) {
-  transform: translate(-50%, -50%) rotateY(180deg) translateZ(400px);
-  animation-delay: -10s;
-}
-.card-3d div:nth-child(7) {
-  transform: translate(-50%, -50%) rotateY(216deg) translateZ(400px);
-  animation-delay: -12s;
-}
-.card-3d div:nth-child(8) {
-  transform: translate(-50%, -50%) rotateY(252deg) translateZ(400px);
-  animation-delay: -14s;
-}
-.card-3d div:nth-child(9) {
-  transform: translate(-50%, -50%) rotateY(288deg) translateZ(400px);
-  animation-delay: -16s;
-}
-.card-3d div:nth-child(10) {
-  transform: translate(-50%, -50%) rotateY(324deg) translateZ(400px);
-  animation-delay: -18s;
+/* Responsive */
+@media (max-width: 768px) {
+  .carousel-card {
+    width: 280px;
+    height: 180px;
+  }
+  .carousel-fade-left,
+  .carousel-fade-right {
+    width: 20px;
+  }
 }

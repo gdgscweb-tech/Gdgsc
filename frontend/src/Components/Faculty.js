@@ -38,42 +38,17 @@ const Faculty = () => {
         }}
       >
         <Frame text={"Dr. Jyoti"}>
-          <div
-            style={{
-              padding: "10px 40px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              alignItems: "center",
-              textAlign: "center",
-            }}
-          >
-            <img
-              src="/images/mam/jyoti_mam1.jpg"
-              width={"200px"}
-              height={"230px"}
-              style={{ objectFit: "cover" }}
-            ></img>
-          </div>
+          <img
+            src="/images/mam/jyoti_mam1.jpg"
+            alt="Dr. Jyoti"
+          />
         </Frame>
 
         <Frame text={"Dr. Renu"}>
-          <div
-            style={{
-              padding: "10px 40px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              alignItems: "center",
-              textAlign: "center",
-            }}
-          >
-            <img
-              src="/images/mam/renu_mam.jpg"
-              width={"200px"}
-              height={"230px"}
-            ></img>
-          </div>
+          <img
+            src="/images/mam/renu_mam.jpg"
+            alt="Dr. Renu"
+          />
         </Frame>
       </div>
       <div

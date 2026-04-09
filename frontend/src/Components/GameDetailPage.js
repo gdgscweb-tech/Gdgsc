@@ -1,17 +1,85 @@
 import React from "react";
 import DetailCarousel from "./DetailCarousel";
-import { Play } from "lucide-react";
+import { Play, Download, ExternalLink, ArrowLeft, Monitor, Smartphone, Globe, Gamepad2 } from "lucide-react";
 import "./GameDetailPage.css";
-import { ArrowLeft } from "lucide-react";
+
+// Helper to determine if a link is a downloadable file
+const isDownloadLink = (link) => {
+  if (!link) return false;
+  const downloadExtensions = ['.zip', '.rar', '.7z', '.exe', '.msi', '.dmg', '.apk', '.tar', '.gz'];
+  const lowerLink = link.toLowerCase();
+  return downloadExtensions.some(ext => lowerLink.includes(ext));
+};
+
+// Helper to determine if a link is a placeholder
+const isPlaceholderLink = (link) => {
+  return !link || link === '#' || link === '';
+};
+
+// Platform icon mapper
+const getPlatformIcon = (platform) => {
+  switch (platform) {
+    case 'Windows':
+    case 'macOS':
+    case 'Linux':
+      return <Monitor size={16} />;
+    case 'Android':
+    case 'iOS':
+      return <Smartphone size={16} />;
+    case 'Web':
+      return <Globe size={16} />;
+    default:
+      return <Gamepad2 size={16} />;
+  }
+};
 
 const GameDetailPage = ({ game, onBack, showBackButton }) => {
   const handlePlayGame = () => {
-    if (game.gameLink) {
-      window.open(game.gameLink, "_blank");
+    if (isPlaceholderLink(game.gameLink)) {
+      return; // Do nothing for placeholder links
+    }
+
+    if (isDownloadLink(game.gameLink)) {
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = game.gameLink;
+      link.download = game.gameFile || game.title;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
-      console.error("Game link not available.");
+      // Open external link in new tab
+      window.open(game.gameLink, "_blank");
     }
   };
+
+  // Determine button text and icon
+  const getButtonConfig = () => {
+    if (isPlaceholderLink(game.gameLink)) {
+      return { text: "COMING SOON", icon: null, disabled: true };
+    }
+    if (isDownloadLink(game.gameLink)) {
+      return {
+        text: `DOWNLOAD ${game.title.toUpperCase()}`,
+        icon: <Download size={24} className="play-icon" />,
+        disabled: false,
+      };
+    }
+    return {
+      text: `PLAY ${game.title.toUpperCase()}`,
+      icon: <ExternalLink size={24} className="play-icon" />,
+      disabled: false,
+    };
+  };
+
+  const buttonConfig = getButtonConfig();
+
+  // Separate screenshots into images and videos
+  const mediaItems = (game.screenshots || []).map(url => {
+    const lower = url.toLowerCase();
+    const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.mov') || lower.endsWith('.ogg');
+    return { url, isVideo };
+  });
 
   return (
     <div className="detail-page-wrapper">
@@ -28,8 +96,8 @@ const GameDetailPage = ({ game, onBack, showBackButton }) => {
         <h1 className="detail-page-title">{game.title}</h1>
       </div>
 
-      {/* Carousel Section */}
-      <DetailCarousel screenshots={game.screenshots} gameTitle={game.title} />
+      {/* Carousel Section — supports both images and videos */}
+      <DetailCarousel screenshots={game.screenshots} gameTitle={game.title} mediaItems={mediaItems} />
 
       {/* Content Box */}
       <div className="detail-content-box">
@@ -47,8 +115,8 @@ const GameDetailPage = ({ game, onBack, showBackButton }) => {
           </div>
 
           <div className="metadata-item">
-            <h3 className="metadata-heading">Development Year</h3>
-            <p className="metadata-text">{game.info.year}</p>
+            <h3 className="metadata-heading">Release Year</h3>
+            <p className="metadata-text">{game.info?.year || "N/A"}</p>
           </div>
 
           <div className="metadata-item">
@@ -57,11 +125,32 @@ const GameDetailPage = ({ game, onBack, showBackButton }) => {
           </div>
         </div>
 
-        {/* Play Game Button */}
+        {/* Platforms */}
+        {game.platforms && game.platforms.length > 0 && (
+          <div className="platforms-section">
+            <h3 className="metadata-heading" style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
+              Available On
+            </h3>
+            <div className="platforms-grid">
+              {game.platforms.map((platform) => (
+                <div key={platform} className="platform-chip">
+                  {getPlatformIcon(platform)}
+                  <span>{platform}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Play / Download / Coming Soon Button */}
         <div className="box-button">
-          <button onClick={handlePlayGame} className="play-game-button">
-            <Play size={24} className="play-icon" fill="black" />
-            PLAY {game.title.toUpperCase()}
+          <button
+            onClick={handlePlayGame}
+            className={`play-game-button ${buttonConfig.disabled ? 'play-game-button--disabled' : ''}`}
+            disabled={buttonConfig.disabled}
+          >
+            {buttonConfig.icon}
+            {buttonConfig.text}
           </button>
         </div>
       </div>

@@ -19,7 +19,7 @@ const FeatureBanner = ({
       <div className="categories-grid">
         {categories.map((category) => (
           <div
-            key={category.id}
+            key={category._id || category.id}
             className={`category-card ${
               selectedGenre === category.name ? "is-selected" : ""
             }`}

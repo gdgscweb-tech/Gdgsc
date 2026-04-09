@@ -41,144 +41,25 @@ const About = () => {
               justifyContent: "center",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                alignItems: "center",
-                textAlign: "center",
-                padding: "20px",
-                borderRadius: "15px",
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-                transform: "translateY(0)",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                animation: "fadeInUp 0.8s ease-out",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = "translateY(-10px) scale(1.05)";
-                e.target.style.boxShadow = "0 20px 40px rgba(248, 111, 19, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = "translateY(0) scale(1)";
-                e.target.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
-              }}
-            >
-              <span
-                style={{
-                  display: "flex",
-                  fontSize: "3.2em",
-                  fontWeight: "700",
-                  color: "white",
-                  background:"transparent",
-                  textShadow: "0 0 20px rgba(248, 111, 19, 0.8), 0 0 40px rgba(248, 111, 19, 0.4)",
-                  animation: "glow 2s ease-in-out infinite alternate",
-                }}
-              >
-                <Counter target={60} duration={1000} /> +
+            <div className="about-stat-card stat-saffron">
+              <span className="about-stat-number">
+                <Counter target={60} duration={1000} /><span className="stat-plus">+</span>
               </span>
-              <span style={{ 
-                color: "rgba(255, 255, 255, 0.9)", 
-                fontWeight: "500",
-                fontSize: "1.1em",
-                letterSpacing: "1px",
-              }}> Team members</span>
+              <span className="about-stat-label">Team members</span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                alignItems: "center",
-                textAlign: "center",
-                padding: "20px",
-                borderRadius: "15px",
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-                transform: "translateY(0)",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                animation: "fadeInUp 0.8s ease-out 0.2s both",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = "translateY(-10px) scale(1.05)";
-                e.target.style.boxShadow = "0 20px 40px rgba(218, 218, 218, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = "translateY(0) scale(1)";
-                e.target.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
-              }}
-            >
-              <span
-                style={{
-                  display: "flex",
-                  fontSize: "3.2em",
-                  fontWeight: "700",
-                  color: "white",
-                  textShadow: "0 0 20px rgba(218, 218, 218, 0.8), 0 0 40px rgba(218, 218, 218, 0.4)",
-                  animation: "glow 2s ease-in-out infinite alternate 0.5s",
-                }}
-              >
-                <Counter target={1} duration={500} /> +
+            
+            <div className="about-stat-card stat-white">
+              <span className="about-stat-number">
+                <Counter target={1} duration={500} /><span className="stat-plus">+</span>
               </span>
-              <span style={{ 
-                color: "rgba(255, 255, 255, 0.9)", 
-                fontWeight: "500",
-                fontSize: "1.1em",
-                letterSpacing: "1px"
-              }}> Years of existence</span>
+              <span className="about-stat-label">Years active</span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                alignItems: "center",
-                textAlign: "center",
-                padding: "20px",
-                borderRadius: "15px",
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-                transform: "translateY(0)",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                animation: "fadeInUp 0.8s ease-out 0.4s both",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = "translateY(-10px) scale(1.05)";
-                e.target.style.boxShadow = "0 20px 40px rgba(22, 150, 10, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = "translateY(0) scale(1)";
-                e.target.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
-              }}
-            >
-              <span
-                style={{
-                  display: "flex",
-                  fontSize: "3.2em",
-                  fontWeight: "700",
-                  color: "white",
-                  textShadow: "0 0 20px rgba(22, 150, 10, 0.8), 0 0 40px rgba(22, 150, 10, 0.4)",
-                  animation: "glow 2s ease-in-out infinite alternate 1s",
-                }}
-              >
-                <Counter target={200} duration={1000} /> +
+            
+            <div className="about-stat-card stat-green">
+              <span className="about-stat-number">
+                <Counter target={200} duration={1000} /><span className="stat-plus">+</span>
               </span>
-              <span style={{ 
-                color: "rgba(255, 255, 255, 0.9)", 
-                fontWeight: "500",
-                fontSize: "1.1em",
-                letterSpacing: "1px"
-              }}> Community Members</span>
+              <span className="about-stat-label">Community</span>
             </div>
           </div>
         </div>

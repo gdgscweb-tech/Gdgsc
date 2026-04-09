@@ -1,0 +1,26 @@
+{
+  "title": "Car Goes Brr",
+  "description": "A retro-styled top-down racing game where you drift, dodge obstacles, and blaze through pixel-art tracks at breakneck speed.",
+  "fullStory": "Car Goes Brr is a fast-paced, pixel-art racing game that puts you behind the wheel of a tiny but mighty car. Navigate through a variety of hand-crafted tracks — from the sun-soaked Glimmer Grasslands to icy frozen docks — each filled with tight corners, rolling boulders, wandering wildlife, and checkered finish lines. Master the art of drifting to cut corners, dodge hazards, and set blazing lap times. With its retro aesthetic and satisfying controls, Car Goes Brr captures the pure joy of arcade racing.",
+  "genre": "Racing",
+  "developer": "GDGSC",
+  "image": "/api/games/assets/Car goes brr/car1.webp",
+  "screenshots": [
+    "/api/games/assets/Car goes brr/car2.webp",
+    "/api/games/assets/Car goes brr/car3.webp",
+    "/api/games/assets/Car goes brr/car4.webp",
+    "/api/games/assets/Car goes brr/car5.webp"
+  ],
+  "gameLink": "/api/games/assets/Car goes brr/Car_goes_Brrr .rar",
+  "platforms": [
+    "Windows"
+  ],
+  "gameFolder": "Car goes brr",
+  "gameFile": "Car_goes_Brrr .rar",
+  "info": {
+    "players": "1",
+    "year": "2025"
+  },
+  "isFeatured": true,
+  "isActive": true
+}
