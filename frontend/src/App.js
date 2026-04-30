@@ -14,6 +14,7 @@ import MeetTeam from "./Pages/MeetTeam";
 import Gallery from "./Pages/gallery";
 import StayTuned from "./Pages/StayTuned";
 import Gamepage from "./Pages/Gamepage";
+import { isGamesEnabled } from "./config/features";
 const App = () => {
   return (
     <BrowserRouter>
@@ -42,7 +43,10 @@ const MainRoutes = () => {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/games" element={<Gamepage />} />
+        <Route
+          path="/games"
+          element={isGamesEnabled ? <Gamepage /> : <StayTuned />}
+        />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/stay-tuned" element={<StayTuned />} />
       </Routes>

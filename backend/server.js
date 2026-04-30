@@ -14,6 +14,7 @@ dotenv.config({ path: './.env' }); // Make sure this path is correct
 
 // Environment-based configuration
 const isProduction = process.env.NODE_ENV === 'production';
+const isGamesEnabled = process.env.ENABLE_GAMES === 'true' || !isProduction;
 
 const config = {
     frontendUrl: isProduction ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL,
@@ -25,6 +26,7 @@ const config = {
 console.log(`Running in ${process.env.NODE_ENV} mode`);
 console.log(`Frontend URL: ${config.frontendUrl}`);
 console.log(`Backend URL: ${config.backendUrl}`);
+console.log(`Games feature enabled: ${isGamesEnabled}`);
 
 // Passport config
 require('./src/config/passport')(passport);
@@ -90,10 +92,18 @@ app.use('/api/user', require('./src/routes/userRoutes'));
 app.use('/api/events', require('./src/routes/eventRoutes'));          // NEW
 app.use('/api/registrations', require('./src/routes/registrationRoutes')); // NEW
 
-// Serve game assets (images, downloads) from /src/games as static files
-app.use('/api/games/assets', express.static(path.join(__dirname, 'src/games')));
-
-app.use('/api/games', require('./src/routes/gamesRoutes'));               // Games & Categories
+if (isGamesEnabled) {
+    // Serve game assets (images, downloads) from /src/games as static files
+    app.use('/api/games/assets', express.static(path.join(__dirname, 'src/games')));
+    app.use('/api/games', require('./src/routes/gamesRoutes'));
+} else {
+    app.use('/api/games/assets', (_req, res) => {
+        res.status(404).json({ message: 'Games are not live yet.' });
+    });
+    app.use('/api/games', (_req, res) => {
+        res.status(404).json({ message: 'Games are not live yet.' });
+    });
+}
 
 
 // Serve frontend in production (if applicable)

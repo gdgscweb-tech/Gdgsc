@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { isGamesEnabled } from "../config/features";
 import "./Navbar.css"; // Import the CSS file
 
 const Navbar = () => {
@@ -44,11 +45,13 @@ const Navbar = () => {
             EVENTS
           </Link>
         </li>
-        <li>
-          <Link to="/games" onClick={closeMenu}>
-            GAMES
-          </Link>
-        </li>
+        {isGamesEnabled && (
+          <li>
+            <Link to="/games" onClick={closeMenu}>
+              GAMES
+            </Link>
+          </li>
+        )}
         <li>
           <Link to="/team" onClick={closeMenu}>
             TEAMS
