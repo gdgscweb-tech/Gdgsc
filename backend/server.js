@@ -14,7 +14,8 @@ dotenv.config({ path: './.env' }); // Make sure this path is correct
 
 // Environment-based configuration
 const isProduction = process.env.NODE_ENV === 'production';
-const isGamesEnabled = process.env.ENABLE_GAMES === 'true' || !isProduction;
+const gamesFlag = process.env.ENABLE_GAMES;
+const isGamesEnabled = gamesFlag === 'true' || (gamesFlag !== 'false' && !isProduction);
 
 const config = {
     frontendUrl: isProduction ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL,

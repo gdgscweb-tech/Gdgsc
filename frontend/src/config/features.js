@@ -1,5 +1,7 @@
+const gamesFlag = process.env.REACT_APP_ENABLE_GAMES;
+
 const isGamesEnabled =
-  process.env.REACT_APP_ENABLE_GAMES === "true" ||
-  process.env.REACT_APP_ENV !== "production";
+  gamesFlag === "true" ||
+  (gamesFlag !== "false" && process.env.NODE_ENV !== "production");
 
 export { isGamesEnabled };
