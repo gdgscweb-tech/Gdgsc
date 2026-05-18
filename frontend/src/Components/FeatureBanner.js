@@ -1,6 +1,5 @@
 import React from "react";
 import "./FeatureBanner.css";
-import { useState } from "react";
 
 const FeatureBanner = ({
   categories,

@@ -1,6 +1,6 @@
 import React from "react";
-import { FaCrown, FaScroll, FaDragon, FaCoins } from "react-icons/fa";
-import { FaInstagram, FaLinkedin, FaGithub } from "react-icons/fa";
+import { FaCrown, FaScroll, } from "react-icons/fa";
+import { FaInstagram, FaLinkedin} from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 
 const Footer = () => {
@@ -15,7 +15,7 @@ const Footer = () => {
           <div className="royal-crest">
             <FaCrown className="crown-icon" style={{ zIndex: "10" }} />
             <div className="crest-circle" style={{ position: "relative" }}>
-              <img src="/assets/logos/logo1.jpg" width={"100%"} />
+              <img src="/assets/logos/logo1.jpg" alt="" width={"100%"} />
             </div>
           </div>
           <div className="royal-info">

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./AdminNavbar.css";
 
 const AdminNavbar = () => {
   const [activeTab, setActiveTab] = useState("calendar");
-  const navigate = useNavigate();
 
   return (
     <div className="admin-navbar">

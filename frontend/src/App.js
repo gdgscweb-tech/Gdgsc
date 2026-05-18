@@ -26,7 +26,6 @@ const App = () => {
 };
 
 const MainRoutes = () => {
-  const { user } = useAuth();
 
   return (
     <>

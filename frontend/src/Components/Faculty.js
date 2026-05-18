@@ -1,6 +1,5 @@
 import React from "react";
 import Frame from "./Frame/Frame";
-import Button from "./Frame/Button";
 
 const Faculty = () => {
   return (
@@ -59,7 +58,6 @@ const Faculty = () => {
           marginTop: "40px",
         }}
       >
-        {/* <Button text="View all teams"></Button> */}
       </div>
     </div>
   );
