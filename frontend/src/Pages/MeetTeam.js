@@ -627,11 +627,9 @@ const MeetTeam = () => {
                     <div className="image-wrapper">
                       {member.photo !== '' ? <img
                         src={member.photo}
-                        onerror="this.onerror=null; this.src='/images/meetteam/fallback-image.jpg';"
                         alt={member.name}
                         className="member-image"
                         onError={(e) => {
-                          e.target.onerror = null;
                           e.target.src = "/images/meetteam/fallback-image.jpg";
                         }}
                       />:
