@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../Button"; // Assuming you have a reusable Button component
+import Button from "../Button"; 
 import { motion } from "framer-motion";
 
 const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
@@ -29,11 +29,9 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
   if (now < regStartDate) {
     buttonText = "Registration Opens Soon";
     isButtonDisabled = true;
-    buttonVariant = "disabled";
   } else if (now > regEndDate) {
     buttonText = "Registration Closed";
     isButtonDisabled = true;
-    buttonVariant = "disabled";
   } else {
     // Registration is open
     buttonText = "Register Now";

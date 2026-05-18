@@ -50,7 +50,7 @@ const About = () => {
             
             <div className="about-stat-card stat-white">
               <span className="about-stat-number">
-                <Counter target={1} duration={500} /><span className="stat-plus">+</span>
+                <Counter target={2} duration={500} /><span className="stat-plus">+</span>
               </span>
               <span className="about-stat-label">Years active</span>
             </div>
@@ -137,10 +137,3 @@ const About = () => {
 };
 
 export default About;
-
-
-
-
-
-
-

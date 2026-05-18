@@ -14,7 +14,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/vedaantbudakoti/",
           instagram: "https://www.instagram.com/vedaant._.vbd/",
           github: "https://github.com/Vedaant-VBD",
-          photo: "images/meetteam/Office Bearers/Chairman/Vedaant (president).jpg",
+          photo: "images/meetteam/OfficeBearers/Chairman/vedaant(president).jpg",
         },
         {
           name: "Mohammad",
@@ -22,7 +22,7 @@ const MeetTeam = () => {
           linkedin: "#",
           github: "#",
           instagram: "#",
-          photo: "images/meetteam/Office Bearers/Vice-Chairman/Mohammad.jpg",
+          photo: "images/meetteam/OfficeBearers/Vice-Chairman/Mohammad.jpg",
         },
         {
           name: "Prarthna",
@@ -30,7 +30,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/nishant-38aa9b24b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
           instagram: "https://www.instagram.com/_nishant__cifrado?igsh=YzVwdWg2em0ycGQw",
           github: "https://github.com/Frenzy16327",
-          photo: "images/meetteam/Office Bearers/General Secretary/Prarthna (treasurer).jpg",
+          photo: "images/meetteam/OfficeBearers/GeneralSecretary/Prarthna(treasurer).jpg",
         },
         {
           name: "Yash Tohan",
@@ -38,7 +38,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Office Bearers/Joint Secretary/Yash Tohan.png",
+          photo: "images/meetteam/OfficeBearers/JointSecretary/YashTohan.png",
         },
       ],
     },
@@ -52,7 +52,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/vedaantbudakoti/",
           instagram: "https://www.instagram.com/vedaant._.vbd/",
           github: "https://github.com/Vedaant-VBD",
-          photo:"images/meetteam/Office Bearers/Chairman/vedaant (president).jpg",
+          photo: "images/meetteam/OfficeBearers/Chairman/vedaant(president).jpg",
         },
         {
           name: "Kavya Sharma",
@@ -60,7 +60,7 @@ const MeetTeam = () => {
           linkedin: "https://in.linkedin.com/in/kavya-sharma-6b42ba291",
           instagram: "https://www.instagram.com/sharma6814kavya?igsh=bTB6cGhvOTJwZHd3",
           github: "https://github.com/Kavya6814",
-          photo:"images/meetteam/Team Blender/KavyaSharma1.jpg",
+          photo: "images/meetteam/TeamBlender/KavyaSharma1.jpg",
         },
         {
           name: "Simant Pandit",
@@ -68,7 +68,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/simant-pandit-634a13312",
           instagram: "https://www.instagram.com/simant._pandit/",
           github: "https://github.com/Patagobhi",
-          photo:"images/meetteam/Team Unreal/Simant Pandit1.jpg",
+          photo: "images/meetteam/TeamUnreal/SimantPandit1.jpg",
         },
         {
           name: "Shubham Singh",
@@ -76,40 +76,8 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "https://github.com/Shubhamkira10",
-          photo:"images/meetteam/Team Unreal/Shubham1.jpg",
-        },
-        {
-          name: "Prashant Baliyan",
-          role: "PR",
-          linkedin: "#",
-          instagram: "https://www.instagram.com/p.baliyan_?igsh=Nng2cWV3NjE1MzV4",
-          github: "#",
-          photo:"images/meetteam/Team Outreach/prashant.jpg",
-        },
-        {
-          name: "Aditya Singh",
-          role: "Design",
-          linkedin: "https://www.linkedin.com/in/its-adityasingh/",
-          instagram: "https://www.instagram.com/k_aditya_singh/",
-          github: "https://github.com/its-adityasingh",
-          photo:"images/meetteam/Team Prototype/Aditya Singh.jpeg",
-        },
-        {
-          name: "Dev Nath",
-          role: "Design",
-          linkedin: "https://www.linkedin.com/in/dev-nath-1093a432a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-          instagram: "https://www.instagram.com/nuke.psd?igsh=YTYzbWNiN2FwenNz",
-          github: "#",
-          photo:"images/meetteam/Team Prototype/Dev Nath (1).jpg",
-        },
-        {
-          name: "Raghav Gupta",
-          role: "Events",
-          linkedin: "https://www.linkedin.com/in/raghav-gupta-bb4757323/",
-          instagram: "#",
-          github: "#",
-          photo:"images/meetteam/Team Overwatch/RG.png",
-        },
+          photo: "images/meetteam/TeamUnreal/Shubham1.jpg",
+        }
         
       ],
     },
@@ -124,7 +92,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Aryan kumar (Team Unreal).jpg",
+          photo: "images/meetteam/TeamUnreal/Aryankumar(TeamUnreal).jpg",
         },
         {
           name: "Krrish Gupta",
@@ -132,7 +100,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Krrish Gupta (Team Unreal).jpg",
+          photo: "images/meetteam/TeamUnreal/KrrishGupta(TeamUnreal).jpg",
         },
         {
           name: "Pragyank Sinha",
@@ -140,7 +108,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Pragyank.png",
+          photo: "images/meetteam/TeamUnreal/Pragyank.png",
         },
         {
           name: "Shubh",
@@ -148,7 +116,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Shubh.jpeg",
+          photo: "images/meetteam/TeamUnreal/Shubh.jpeg",
         },
         {
           name: "Tushar",
@@ -156,7 +124,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Tushar-_-.jpg",
+          photo: "images/meetteam/TeamUnreal/Tushar-_-.jpg",
         },
         {
           name: "Simant Pandit",
@@ -164,7 +132,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Simant Pandit1.jpg",
+          photo: "images/meetteam/TeamUnreal/SimantPandit1.jpg",
         },
         {
           name: "Shubham",
@@ -172,7 +140,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Shubham1.jpg",
+          photo: "images/meetteam/TeamUnreal/Shubham1.jpg",
         },
         {
           name: "Vichitra Verma",
@@ -180,7 +148,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Unreal/Vichitra Verma (Team Unreal).jpg",
+          photo: "images/meetteam/TeamUnreal/VichitraVerma(TeamUnreal).jpg",
         },
         {
           name: "Navneet Guglani",
@@ -188,7 +156,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/navneet-guglani-1192b9291?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
           instagram: "https://www.instagram.com/navneet_guglani?igsh=MWNtdGNxNHhzaGVvcQ==",
           github: "https://github.com/Navneet1710",
-          photo:"images/meetteam/Team Unreal/Navneet_.jpg",
+          photo: "images/meetteam/TeamUnreal/Navneet_.jpg",
         },
         
       ],
@@ -204,7 +172,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/saksham-kumar-aggarwal-769bb8308",
           instagram: "https://www.instagram.com/m1551ngn0?igsh=MW1jYjBzaWYyZ3UzMQ==",
           github: "https://github.com/M1ss1ngN0",
-          photo:"images/meetteam/Team Blender/Saksham.jpg",
+          photo: "images/meetteam/TeamBlender/Saksham.jpg",
         },
         {
           name: "Aditya Bhatnagar",
@@ -212,7 +180,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Aditya Bhatnagar (Team Blender).jpg",
+          photo: "images/meetteam/TeamBlender/AdityaBhatnagar(TeamBlender).jpg",
         },
         {
           name: "Aryan Shekhar Vats",
@@ -220,7 +188,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Aryan Shekhar Vats(Team Blender).jpg",
+          photo: "images/meetteam/TeamBlender/AryanShekharVats(TeamBlender).jpg",
         },
         {
           name: "Dev Dhir",
@@ -228,7 +196,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Dev.png",
+          photo: "images/meetteam/TeamBlender/Dev.png",
         },
         {
           name: "Dhruv Vashishth",
@@ -236,7 +204,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Dhruv Vashishth final.jpg",
+          photo: "images/meetteam/TeamBlender/DhruvVashishthfinal.jpg",
         },
         {
           name: "Kavya Sharma",
@@ -244,7 +212,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/KavyaSharma1.jpg",
+          photo: "images/meetteam/TeamBlender/KavyaSharma1.jpg",
         },
         {
           name: "Lalit Kumar",
@@ -252,7 +220,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Lalit Kumar (Team Blender).jpg",
+          photo: "images/meetteam/TeamBlender/LalitKumar(TeamBlender).jpg",
         },
         {
           name: "Mohit Kumar",
@@ -260,7 +228,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Mohit Kumar (blender).jpg",
+          photo: "images/meetteam/TeamBlender/MohitKumar(blender).jpg",
         },
         {
           name: "Ved Prakash Sharma",
@@ -268,7 +236,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Blender/Ved Prakash Sharma (Team Blender).jpg",
+          photo: "images/meetteam/TeamBlender/VedPrakashSharma(TeamBlender).jpg",
         },
         {
           name: "Raghav Bhatia",
@@ -276,7 +244,7 @@ const MeetTeam = () => {
           linkedin: "https://www.linkedin.com/in/raghav-bhatia-775854214/",
           instagram: "https://www.instagram.com/raghavbhatia.23/?hl=en",
           github: "https://github.com/raghav-2310",
-          photo:"images/meetteam/Team Blender/Raghav Bhatia.jpeg",
+          photo: "images/meetteam/TeamBlender/RaghavBhatia.jpeg",
         },
         
       ],
@@ -291,7 +259,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/anmol (overwatch).jpg",
+          photo: "images/meetteam/TeamOverwatch/anmol(overwatch).jpg",
         },
         {
           name: "AYUSHI SINGH",
@@ -299,7 +267,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/AYUSHI_SINGH(OVERWATCH).jpg",
+          photo: "images/meetteam/TeamOverwatch/AYUSHI_SINGH(OVERWATCH).jpg",
         },
         {
           name: "Ayush Joshi",
@@ -307,7 +275,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/AYUSHJOSHI(OVERWATCH).jpg",
+          photo: "images/meetteam/TeamOverwatch/AYUSHJOSHI(OVERWATCH).jpg",
         },
         {
           name: "Billy",
@@ -315,7 +283,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/Billy.jpg",
+          photo: "images/meetteam/TeamOverwatch/Billy.jpg",
         },
         {
           name: "Love Kumar",
@@ -323,7 +291,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/Love kumar (OVERWATCH).jpg",
+          photo: "images/meetteam/TeamOverwatch/Lovekumar(OVERWATCH).jpg",
         },
         {
           name: "Piyush Rana",
@@ -331,7 +299,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/PIYUSH RANA(OVERWATCH).jpg",
+          photo: "images/meetteam/TeamOverwatch/PIYUSHRANA(OVERWATCH).jpg",
         },
         {
           name: "Satyam",
@@ -339,7 +307,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/Satyam.png",
+          photo: "images/meetteam/TeamOverwatch/Satyam.png",
         },
         {
           name: "Swayam Kumar Gupta",
@@ -347,7 +315,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Overwatch/swayam kumar gupta (team overwatch).jpg",
+          photo: "images/meetteam/TeamOverwatch/swayamkumargupta(teamoverwatch).jpg",
         },
       ],
     },
@@ -362,7 +330,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Avani .jpg",
+          photo: "images/meetteam/TeamOutreach/Avani.jpg",
         },
         {
           name: "Divyanshu Choubey",
@@ -370,7 +338,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Divyanshu Choubey(Outreach).jpeg",
+          photo: "images/meetteam/TeamOutreach/DivyanshuChoubey(Outreach).jpeg",
         },
         {
           name: "Harshita",
@@ -378,7 +346,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Harshita (outreach).jpg",
+          photo: "images/meetteam/TeamOutreach/Harshita(outreach).jpg",
         },
         {
           name: "Prateek Rathee",
@@ -386,7 +354,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Prateek Rathee .jpg",
+          photo: "images/meetteam/TeamOutreach/PrateekRathee.jpg",
         },
         {
           name: "Prisha",
@@ -394,7 +362,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Prisha.jpg",
+          photo: "images/meetteam/TeamOutreach/Prisha.jpg",
         },
         {
           name: "Ridima Goyal",
@@ -402,7 +370,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Ridima Goyal( Team Outreach ).jpg",
+          photo: "images/meetteam/TeamOutreach/RidimaGoyal(TeamOutreach).jpg",
         },
         {
           name: "Sanvi",
@@ -410,7 +378,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Sanvi ( Outreach ).jpg",
+          photo: "images/meetteam/TeamOutreach/Sanvi(Outreach).jpg",
         },
         {
           name: "Shraddha",
@@ -418,7 +386,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Shraddha.jpg",
+          photo: "images/meetteam/TeamOutreach/Shraddha.jpg",
         },
         {
           name: "Shubham",
@@ -426,7 +394,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team Outreach/Shubham (outreach).jpg",
+          photo: "images/meetteam/TeamOutreach/Shubham(outreach).jpg",
         },
       ],
     },
@@ -440,7 +408,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Adarsh (Team catalyst).jpg",
+          photo: "images/meetteam/TeamCatalyst/Adarsh(TeamCatalyst).jpg",
         },
         {
           name: "Garvit",
@@ -448,7 +416,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Garvit.png",
+          photo: "images/meetteam/TeamCatalyst/Garvit.png",
         },
         {
           name: "Mayank Bisht",
@@ -456,7 +424,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Mayank Bisht(team catalyst).jpg",
+          photo: "images/meetteam/TeamCatalyst/MayankBisht(teamcatalyst).jpg",
         },
         {
           name: "Ojus Mathur",
@@ -464,7 +432,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/OJUS MATHUR (Team Catalyst).jpeg",
+          photo: "images/meetteam/TeamCatalyst/OJUSMATHUR(TeamCatalyst).jpeg",
         },
         {
           name: "Ujjwal",
@@ -472,7 +440,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Ujjwal_Team-Catalyst.jpg",
+          photo: "images/meetteam/TeamCatalyst/Ujjwal_Team-Catalyst.jpg",
         },
         {
           name: "Vaibhav Rastogi",
@@ -480,7 +448,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Vaibhav Rastogi Catalyst.jpg",
+          photo: "images/meetteam/TeamCatalyst/VaibhavRastogiCatalyst.jpg",
         },
         {
           name: "Vansh Johri",
@@ -488,7 +456,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo:"images/meetteam/Team catalyst_/Vansh johri team catalyst .jpg",
+          photo: "images/meetteam/TeamCatalyst/Vanshjohriteamcatalyst.jpg",
         },
       ],
     },
@@ -502,7 +470,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team scratch_/Himanshu Tiwari (Team Scratch).jpg",
+          photo: "images/meetteam/TeamScratch/HimanshuTiwari(TeamScratch).jpg",
         },
         {
           name: "Arihant Jain",
@@ -510,7 +478,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team scratch_/Arihant.jpg",
+          photo: "images/meetteam/TeamScratch/Arihant.jpg",
         },
         {
           name: "Utkarsh Sharma",
@@ -518,15 +486,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team scratch_/Utkarshh.jpg",
-        },
-        {
-          name: "Tanmay",
-          role: "WebDev",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "images/meetteam/Team scratch_/tanmay(Team Scratch).JPG",
+          photo: "images/meetteam/TeamScratch/Utkarshh.jpg",
         },
         {
           name: "Rishit Kadha",
@@ -534,7 +494,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "https://www.instagram.com/rishit_kadha_?igsh=eGl3ZWw0cGx2ZWty",
           github: "https://github.com/rishit-kadha",
-          photo:"images/meetteam/Team scratch_/Rishit_Kadha1.jpg",
+          photo: "images/meetteam/TeamScratch/Rishit_Kadha1.jpg",
         },
       ],
     },
@@ -548,15 +508,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/CHIRAG MALVIYA.jpg",
-        },
-        {
-          name: "Dev Nath",
-          role: "Prototyping",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "images/meetteam/Team Prototype/Dev Nath (1).jpg",
+          photo: "images/meetteam/TeamPrototype/CHIRAGMALVIYA.jpg",
         },
         {
           name: "Ishant Aggarwal",
@@ -564,7 +516,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/ISHANT AGGARWAL .png",
+          photo: "images/meetteam/TeamPrototype/ISHANTAGGARWAL.png",
         },
         {
           name: "Kashvi",
@@ -572,7 +524,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/Kashvi(team prototype).jpg",
+          photo: "images/meetteam/TeamPrototype/Kashvi(teamprototype).jpg",
         },
         {
           name: "Rashmaya Vaidya",
@@ -580,7 +532,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/Rashmaya Vaidya.jpg",
+          photo: "images/meetteam/TeamPrototype/RashmayaVaidya.jpg",
         },
         {
           name: "Sambhav",
@@ -588,7 +540,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/sambhav1.jpg",
+          photo: "images/meetteam/TeamPrototype/sambhav1.jpg",
         },
         {
           name: "Shashwat Shivam",
@@ -596,7 +548,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Prototype/Shashwat Shivam.jpg",
+          photo: "images/meetteam/TeamPrototype/ShashwatShivam.jpg",
         },
       ]
     },
@@ -610,7 +562,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Theft/Ashi.png",
+          photo: "images/meetteam/TeamTheft/Ashi.png",
         },
         {
           name: "Gandharv",
@@ -618,7 +570,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Theft/Gandharv (Theft).jpg",
+          photo: "images/meetteam/TeamTheft/Gandharv(Theft).jpg",
         },
         {
           name: "Junaid",
@@ -626,7 +578,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Theft/Junaid(theft) .jpg",
+          photo: "images/meetteam/TeamTheft/Junaid(theft).jpg",
         },
         {
           name: "Pooja",
@@ -634,7 +586,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Theft/Pooja( theft).JPG",
+          photo: "images/meetteam/TeamTheft/Pooja(theft).jpg",
         },
         {
           name: "Shivank Verma",
@@ -642,7 +594,7 @@ const MeetTeam = () => {
           linkedin: "#",
           instagram: "#",
           github: "#",
-          photo: "images/meetteam/Team Theft/Shivank Verma(Team Theft).png",
+          photo: "images/meetteam/TeamTheft/ShivankVerma(TeamTheft).png",
         },
       ]
     },

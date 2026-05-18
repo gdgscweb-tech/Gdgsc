@@ -1,6 +1,5 @@
 import React from "react";
 import "./Gamescard.css";
-import { useMemo } from "react";
 
 const Gamescard = ({ games, selectedGenre, onGameClick, searchQuery }) => {
   const filteredGames = games;

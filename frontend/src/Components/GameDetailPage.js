@@ -1,6 +1,6 @@
 import React from "react";
 import DetailCarousel from "./DetailCarousel";
-import { Play, Download, ExternalLink, ArrowLeft, Monitor, Smartphone, Globe, Gamepad2 } from "lucide-react";
+import { Download, ExternalLink, ArrowLeft, Monitor, Smartphone, Globe, Gamepad2 } from "lucide-react";
 import "./GameDetailPage.css";
 
 // Helper to determine if a link is a downloadable file
