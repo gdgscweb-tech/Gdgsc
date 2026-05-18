@@ -32,12 +32,6 @@ module.exports = function(passport) {
                     return done(null, false, { message: 'This account was created via social login. Please use Google or Discord.' });
                 }
 
-                // This check is now less critical here as frontend will redirect if isProfileComplete is false
-                // but good to have as a backend fallback.
-                if (!user.isProfileComplete) {
-                    return done(null, false, { message: 'Please complete your profile by setting a username.' });
-                }
-
                 const isMatch = await user.matchPassword(password);
 
                 if (!isMatch) {

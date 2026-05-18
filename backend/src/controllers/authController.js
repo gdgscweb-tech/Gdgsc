@@ -31,7 +31,9 @@ exports.registerUser = async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                role: user.role,
+                isProfileComplete: user.isProfileComplete
             }
         });
     } catch (error) {
@@ -54,6 +56,8 @@ exports.loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
+        console.log("LOGIN DEBUG - User:", user.username, "Role:", user.role); // Debugging
+
         res.status(200).json({
             message: 'Logged in successfully',
             token: generateToken(user._id),
@@ -61,7 +65,9 @@ exports.loginUser = async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                role: user.role,
+                isProfileComplete: user.isProfileComplete
             }
         });
     } catch (error) {

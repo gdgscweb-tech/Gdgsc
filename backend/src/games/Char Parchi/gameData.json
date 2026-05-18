@@ -1,0 +1,30 @@
+{
+  "title": "Char Parchi",
+  "description": "A digital take on the classic Indian card game — play as Raja, Mantri, Chor, or Sipahi and outsmart your friends in this voice-enabled party game.",
+  "fullStory": "Char Parchi brings the beloved Indian parlour game to your phone. Four players are secretly assigned roles each round — Raja (King), Mantri (Minister), Chor (Thief), and Sipahi (Soldier). The Mantri must identify the Chor before time runs out, while the Chor tries to stay hidden. Points are awarded based on correct guesses and successful deception. With beautiful traditional Indian art, golden ornamental card designs, and a built-in voice chat system, Char Parchi makes game night effortless whether you're in the same room or miles apart. Play 10 rounds and see who reigns supreme!",
+  "genre": "Casual",
+  "developer": "GDGSC",
+  "image": "/api/games/assets/Char Parchi/cp1.webp",
+  "screenshots": [
+    "/api/games/assets/Char Parchi/cp2.webp",
+    "/api/games/assets/Char Parchi/cp3.webp",
+    "/api/games/assets/Char Parchi/cp4.webp",
+    "/api/games/assets/Char Parchi/cp5.webp",
+    "/api/games/assets/Char Parchi/cp6.webp",
+    "/api/games/assets/Char Parchi/cp7.webp",
+    "/api/games/assets/Char Parchi/cp8.webp",
+    "/api/games/assets/Char Parchi/cp9.webp"
+  ],
+  "gameLink": "#",
+  "platforms": [
+    "Android"
+  ],
+  "gameFolder": "Char Parchi",
+  "gameFile": null,
+  "info": {
+    "players": "4",
+    "year": "2025"
+  },
+  "isFeatured": true,
+  "isActive": true
+}

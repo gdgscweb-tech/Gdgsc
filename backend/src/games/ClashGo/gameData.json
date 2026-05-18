@@ -1,0 +1,28 @@
+{
+  "title": "ClashGo",
+  "description": "A blockchain-powered strategy fighting game where you collect fighters, battle in arenas, and compete in tournaments for SOL rewards.",
+  "fullStory": "ClashGo is a competitive strategy fighting game built on the Solana blockchain. Collect and upgrade powerful fighters — from the electrifying Thunder Breaker to the mighty Earth Titan — each with unique stats for health, attack, defense, and speed. Choose your battlefield, pick your combat style (light, heavy, special, or block), and engage in fast-paced 1v1 battles, ranked matches, or multi-player tournaments. The game also features a built-in quiz system to test your crypto knowledge and earn bonus rewards. With stunning fantasy art, deep strategic gameplay, and real SOL prizes on the line, ClashGo brings the thrill of competitive gaming to Web3.",
+  "genre": "Action",
+  "developer": "GDGSC",
+  "image": "/api/games/assets/ClashGo/clash1.webp",
+  "screenshots": [
+    "/api/games/assets/ClashGo/clash2.webp",
+    "/api/games/assets/ClashGo/clash3.webp",
+    "/api/games/assets/ClashGo/clash4.webp",
+    "/api/games/assets/ClashGo/clash5.webp",
+    "/api/games/assets/ClashGo/clash6.webp"
+  ],
+  "gameLink": "https://clashgo.vercel.app",
+  "platforms": [
+    "Web",
+    "Android"
+  ],
+  "gameFolder": "ClashGo",
+  "gameFile": null,
+  "info": {
+    "players": "2",
+    "year": "2025"
+  },
+  "isFeatured": true,
+  "isActive": true
+}

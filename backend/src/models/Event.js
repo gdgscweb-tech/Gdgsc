@@ -3,6 +3,11 @@
 const mongoose = require('mongoose');
 
 const EventSchema = new mongoose.Schema({
+    eventId: {
+        type: String,
+        unique: true,
+        trim: true,
+    },
     name: {
         type: String,
         required: true,
@@ -14,10 +19,21 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minlength: 10,
         maxlength: 500,
     },
     date: {
+        type: Date,
+        required: true,
+    },
+    eventEndDate: {
+        type: Date,
+        required: true,
+    },
+    registrationStartDate: {
+        type: Date,
+        required: true,
+    },
+    registrationEndDate: {
         type: Date,
         required: true,
     },
@@ -36,13 +52,51 @@ const EventSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-    // --- NEW FIELD FOR IMAGE ---
     imageUrl: {
-        type: String, // Will store the Base64 string
+        type: String, // Will store the Base64 string or URL
         default: '',  // Default to empty string if no image
     },
-    // --- END NEW FIELD ---
+   customRegistrationFields: [{
+    fieldName: { type: String, required: false },   
+    fieldLabel: { type: String, required: false },  
+    fieldType: {
+        type: String,
+        enum: ['text','email','number','tel','textarea','select','checkbox','radio','date'],
+        required: false,
+    },
+    required: { type: Boolean, default: false },
+    options: [String],
+    placeholder: String,
+    validation: {
+        min: Number,
+        max: Number,
+        minLength: Number,
+        maxLength: Number,
+        pattern: String,
+    }
+}]
+
 }, { timestamps: true }); // Adds createdAt and updatedAt timestamps
+
+// Pre-save hook to auto-generate eventId
+EventSchema.pre('save', async function(next) {
+    if (!this.eventId) {
+        // Find the highest eventId number
+        const lastEvent = await mongoose.model('Event').findOne({}, { eventId: 1 }).sort({ eventId: -1 });
+        
+        let nextNumber = 1;
+        if (lastEvent && lastEvent.eventId) {
+            const match = lastEvent.eventId.match(/EVT(\d+)/);
+            if (match) {
+                nextNumber = parseInt(match[1]) + 1;
+            }
+        }
+        
+        // Generate new eventId with leading zeros (e.g., EVT001, EVT002)
+        this.eventId = `EVT${String(nextNumber).padStart(3, '0')}`;
+    }
+    next();
+});
 
 const Event = mongoose.model('Event', EventSchema);
 

@@ -1,197 +1,177 @@
-/* Main Container */
-.gem-fantasy-border {
-    position: relative;
-    padding: 50px;
-    margin: 30px;
-    background: 
-      linear-gradient(145deg, #1a120b 0%, #2a1e0f 50%, #1a120b 100%),
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" opacity="0.08"><path d="M20,0 L100,0 L120,20 L120,100 L100,120 L20,120 L0,100 L0,20 Z" fill="%23d4af37"/><path d="M30,30 L90,30 L90,90 L30,90 Z" fill="none" stroke="%23d4af37" stroke-width="2"/></svg>');
-    border: 18px solid transparent;
-    border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><path d="M0,30 Q0,0 30,0 L50,0 Q60,15 70,0 L90,0 Q110,10 110,30 L110,50 Q125,60 110,70 L110,90 Q120,110 90,110 L70,110 Q60,95 50,110 L30,110 Q10,120 0,90 L0,70 Q-15,60 0,50 Z" fill="none" stroke="%23d4af37" stroke-width="4" stroke-linejoin="round"/></svg>') 25 round;
-    color: #f5e8c9;
-    font-family: 'Cinzel', 'Times New Roman', serif;
-    box-shadow: 
-      0 0 30px rgba(0,0,0,0.8),
-      inset 0 0 20px rgba(212, 175, 55, 0.3);
-    animation: border-glow 4s ease-in-out infinite alternate;
-    z-index: 1;
-  }
-  
-  /* Content Area */
-  .gem-fantasy-content {
-    padding: 40px;
-    background: rgba(10, 5, 0, 0.6);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    position: relative;
-    backdrop-filter: blur(2px);
-    box-shadow: 
-      inset 0 0 30px rgba(0,0,0,0.5),
-      0 0 10px rgba(212, 175, 55, 0.2);
-  }
-  
-  /* Corner Decorations */
-  .corner {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background-repeat: no-repeat;
-    z-index: 2;
-  }
-  
-  .corner-tl {
-    top: 0;
-    left: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M0,25 Q25,25 25,0" fill="none" stroke="%23d4af37" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="%23f5d742"/><circle cx="38" cy="12" r="4" fill="%23f5d742"/></svg>');
-  }
-  
-  .corner-tr {
-    top: 0;
-    right: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M50,25 Q25,25 25,0" fill="none" stroke="%23d4af37" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="%23f5d742"/><circle cx="38" cy="12" r="4" fill="%23f5d742"/></svg>');
-  }
-  
-  .corner-bl {
-    bottom: 0;
-    left: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M0,25 Q25,25 25,50" fill="none" stroke="%23d4af37" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="38" r="4" fill="%23f5d742"/><circle cx="38" cy="38" r="4" fill="%23f5d742"/></svg>');
-  }
-  
-  .corner-br {
-    bottom: 0;
-    right: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M50,25 Q25,25 25,50" fill="none" stroke="%23d4af37" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="38" r="4" fill="%23f5d742"/><circle cx="38" cy="38" r="4" fill="%23f5d742"/></svg>');
-  }
-  
-  /* Gemstones */
-  .gem {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    animation: gem-glow 3s ease-in-out infinite alternate;
-    clip-path: polygon(50% 0%, 80% 20%, 100% 50%, 80% 80%, 50% 100%, 20% 80%, 0% 50%, 20% 20%);
-    box-shadow: 0 0 15px var(--gem-color), inset 0 0 8px #fff;
-    z-index: 3;
-    filter: drop-shadow(0 0 5px var(--gem-color));
-  }
-  
-  .gem.top {
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    --gem-color: #ff0000;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #900000 70%, #000 100%);
-  }
-  
-  .gem.bottom {
-    bottom: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    --gem-color: #ffff00;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #909000 70%, #000 100%);
-  }
-  
-  .gem.left {
-    left: -14px;
-    top: 50%;
-    transform: translateY(-50%);
-    --gem-color: #00ff00;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #009000 70%, #000 100%);
-  }
-  
-  .gem.right {
-    right: -14px;
-    top: 50%;
-    transform: translateY(-50%);
-    --gem-color: #0000ff;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #000090 70%, #000 100%);
-  }
-  
-  /* Additional Center Gems */
-  .gem.center-top {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    --gem-color: #ff00ff;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #9000ff 70%, #000 100%);
-    width: 24px;
-    height: 24px;
-  }
-  
-  .gem.center-bottom {
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    --gem-color: #00ffff;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, var(--gem-color) 30%, #0090ff 70%, #000 100%);
-    width: 24px;
-    height: 24px;
-  }
-  
-  /* Animations */
-  @keyframes border-glow {
-    0% {
-      box-shadow: 
-        0 0 20px rgba(0,0,0,0.7),
-        inset 0 0 15px rgba(212, 175, 55, 0.2);
-      border-image-source: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><path d="M0,30 Q0,0 30,0 L50,0 Q60,15 70,0 L90,0 Q110,10 110,30 L110,50 Q125,60 110,70 L110,90 Q120,110 90,110 L70,110 Q60,95 50,110 L30,110 Q10,120 0,90 L0,70 Q-15,60 0,50 Z" fill="none" stroke="%23d4af37" stroke-width="4" stroke-linejoin="round"/></svg>');
-    }
-    100% {
-      box-shadow: 
-        0 0 40px rgba(0,0,0,0.9),
-        inset 0 0 30px rgba(212, 175, 55, 0.4);
-      border-image-source: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><path d="M0,30 Q0,0 30,0 L50,0 Q60,15 70,0 L90,0 Q110,10 110,30 L110,50 Q125,60 110,70 L110,90 Q120,110 90,110 L70,110 Q60,95 50,110 L30,110 Q10,120 0,90 L0,70 Q-15,60 0,50 Z" fill="none" stroke="%23f5d742" stroke-width="4.5" stroke-linejoin="round"/></svg>');
-    }
-  }
-  
-  @keyframes gem-glow {
-    0% {
-      opacity: 0.8;
-      transform: translateX(-50%) scale(0.95);
-      box-shadow: 0 0 10px var(--gem-color), inset 0 0 5px #fff;
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(-50%) scale(1.1);
-      box-shadow: 0 0 25px var(--gem-color), inset 0 0 12px #fff;
-    }
-  }
-  
-  /* Text Styling */
-  .gem-fantasy-content h2 {
-    color: #f5d742;
-    text-align: center;
-    font-size: 2.2em;
-    margin-bottom: 20px;
-    text-shadow: 1px 1px 3px #000, 0 0 10px rgba(212, 175, 55, 0.5);
-    letter-spacing: 1.5px;
-  }
-  
-  .gem-fantasy-content p {
-    line-height: 1.6;
-    text-align: justify;
-    font-size: 1.1em;
-    padding: 0 10px;
-  }
-  .contest-card{
-    background-color: #000;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 450px; /* Max width for readability */
-    box-sizing: border-box; /* Include padding in width */
+/* ===== Contest Card — Glassmorphic Dark/Gold Theme ===== */
+
+.contest-card {
+  position: relative;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 215, 0, 0.06) 0%,
+    rgba(15, 15, 15, 0.95) 30%,
+    rgba(10, 10, 10, 0.98) 100%
+  );
+  padding: 36px 32px 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 215, 0, 0.08);
+  width: 100%;
+  max-width: 450px;
+  box-sizing: border-box;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.4s ease;
+}
+
+/* Top accent line */
+.contest-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.4) 20%,
+    rgba(255, 215, 0, 0.8) 50%,
+    rgba(255, 215, 0, 0.4) 80%,
+    transparent 100%
+  );
+  opacity: 0.7;
+  transition: opacity 0.4s ease;
+}
+
+/* Animated shimmer sweep on hover */
+.contest-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.03) 40%,
+    rgba(255, 215, 0, 0.06) 50%,
+    rgba(255, 215, 0, 0.03) 60%,
+    transparent 100%
+  );
+  transition: left 0.7s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contest-card:hover::after {
+  left: 100%;
+}
+
+.contest-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 215, 0, 0.35);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    0 0 24px rgba(255, 215, 0, 0.08),
+    inset 0 1px 0 rgba(255, 215, 0, 0.15);
+}
+
+.contest-card:hover::before {
+  opacity: 1;
+}
+
+
+
+/* ===== Card Heading ===== */
+.contest-card h2 {
+  font-family: "Valorax", "Jura", sans-serif;
+  color: #ffd700;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0 0 20px 0;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
+  position: relative;
+  display: inline-block;
+  transition: text-shadow 0.3s ease;
+}
+
+.contest-card h2::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, transparent);
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.contest-card:hover h2 {
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+.contest-card:hover h2::after {
+  width: 70px;
+}
+
+/* ===== Card Body Text ===== */
+.contest-card p {
+  font-family: "Jura", sans-serif;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.contest-card p ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contest-card p ul li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  font-family: "Jura", sans-serif;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.78);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.contest-card p ul li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: rgba(255, 215, 0, 0.6);
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.contest-card:hover p ul li {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.contest-card:hover p ul li::before {
+  color: rgba(255, 215, 0, 0.9);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .contest-card {
+    padding: 28px 24px 24px;
+    border-radius: 12px;
   }
 
-  .contest-card input{
-    background-color: #00000060;
-    color: #fff;
-    border: 1px solid #ffd70080;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    outline: none;
-    margin-top: 10px;
+  .contest-card h2 {
+    font-size: 1.3rem;
   }
+}

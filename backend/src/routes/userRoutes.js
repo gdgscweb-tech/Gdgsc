@@ -5,6 +5,19 @@ const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const admin = require('../middleware/adminMiddleware'); // Import admin middleware
 const User = require('../models/User');
+//@route GET /api/user  
+//@desc Get all users
+//@access Private (Admin)
+router.get('/', protect, admin, async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ message: 'Server error fetching users' });
+    }
+});
+
 
 // @route   GET /api/user/profile
 // @desc    Get current user's profile

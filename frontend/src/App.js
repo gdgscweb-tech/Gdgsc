@@ -11,11 +11,10 @@ import SignupPage from "./Pages/SignupPage";
 import EventsPage from "./Pages/EventsPage";
 import AdminPage from "./Pages/AdminPage";
 import MeetTeam from "./Pages/MeetTeam";
-import Home from "./Pages/Home";
-import AdminNavbar from "./Pages/AdminNavbar";
 import Gallery from "./Pages/gallery";
 import StayTuned from "./Pages/StayTuned";
-
+import Gamepage from "./Pages/Gamepage";
+import { isGamesEnabled } from "./config/features";
 const App = () => {
   return (
     <BrowserRouter>
@@ -27,7 +26,6 @@ const App = () => {
 };
 
 const MainRoutes = () => {
-  const { user } = useAuth();
 
   return (
     <>
@@ -44,6 +42,10 @@ const MainRoutes = () => {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route
+          path="/games"
+          element={isGamesEnabled ? <Gamepage /> : <StayTuned />}
+        />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/stay-tuned" element={<StayTuned />} />
       </Routes>
@@ -52,4 +54,3 @@ const MainRoutes = () => {
 };
 
 export default App;
-

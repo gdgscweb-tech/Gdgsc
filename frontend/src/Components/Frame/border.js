@@ -6,7 +6,6 @@ const Border = ({ h2,p,icon}) => {
         <div className="contest-card">
             <h2>{h2}</h2>
             <p>{p}</p>
-            <div className="icon">{icon}</div>
         </div>
     );
 };

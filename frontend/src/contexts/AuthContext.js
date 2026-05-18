@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             try {
                 const { data } = await api.get('/api/user/profile');
+                // The API returns { user: {...} } so we need to access data.user
                 setUser(data.user);
             } catch (error) {
                 console.error('Failed to load user profile:', error);

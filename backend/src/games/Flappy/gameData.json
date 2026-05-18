@@ -1,0 +1,24 @@
+{
+  "title": "Flappy",
+  "description": "A charming Flappy Bird-inspired game with a cute pink bird, ocean waves, and classic tap-to-fly mechanics. Beat your highscore!",
+  "fullStory": "Flappy is a delightful reimagining of the classic one-tap arcade genre. Guide an adorable pink bird through an endless gauntlet of green pipes hovering above a serene ocean landscape. Tap to flap, time your moves carefully, and try not to crash! The game tracks your highscore locally so you can keep chasing that perfect run. With its calming sky-and-sea backdrop, smooth animations, and addictive 'just one more try' gameplay loop, Flappy is the perfect pick-up-and-play game for quick sessions or marathon attempts at glory.",
+  "genre": "Casual",
+  "developer": "GDGSC",
+  "image": "/api/games/assets/Flappy/flapp1.webp",
+  "screenshots": [
+    "/api/games/assets/Flappy/flapp2.webp",
+    "/api/games/assets/Flappy/flapp3.webp"
+  ],
+  "gameLink": "/api/games/assets/Flappy/Flappy.zip",
+  "platforms": [
+    "Windows"
+  ],
+  "gameFolder": "Flappy",
+  "gameFile": "Flappy.zip",
+  "info": {
+    "players": "1",
+    "year": "2025"
+  },
+  "isFeatured": false,
+  "isActive": true
+}
