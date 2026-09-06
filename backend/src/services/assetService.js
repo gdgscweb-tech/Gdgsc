@@ -10,14 +10,14 @@ const {
   sanitizeVersion,
 } = require("../utils/storageKey");
 const { ApiError } = require("../utils/apiResponse");
-const R2StorageService = require("./storage/R2StorageService");
+const { getDefaultStorageService } = require("./storage/storageFactory");
 
 class AssetService {
   /**
    * @param {import('./storage/IStorageService')} [storageService]
    */
   constructor(storageService) {
-    this.storage = storageService || new R2StorageService();
+    this.storage = storageService || getDefaultStorageService();
   }
 
   /**

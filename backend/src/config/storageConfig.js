@@ -13,7 +13,21 @@ const parseEnvInt = (val, fallback) => {
 };
 
 const storageConfig = {
-  // Cloudflare R2 Credentials & Endpoints
+  // Storage Provider ('google_drive' | 'r2')
+  provider: process.env.STORAGE_PROVIDER || "google_drive",
+
+  // Google Drive Configuration
+  googleDrive: {
+    folderId: process.env.GOOGLE_DRIVE_FOLDER_ID || "",
+    clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL || "",
+    privateKey: (process.env.GOOGLE_DRIVE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
+    clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "",
+    clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "",
+    refreshToken: process.env.GOOGLE_DRIVE_REFRESH_TOKEN || "",
+    publicUrl: (process.env.GOOGLE_DRIVE_PUBLIC_URL || "https://drive.google.com").replace(/\/+$/, ""),
+  },
+
+  // Cloudflare R2 Credentials & Endpoints (Alternative Provider)
   r2: {
     accountId: process.env.R2_ACCOUNT_ID,
     accessKeyId: process.env.R2_ACCESS_KEY_ID,

@@ -73,7 +73,10 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
     (game.gameLink.endsWith(".rar") ||
       game.gameLink.endsWith(".zip") ||
       game.gameLink.endsWith(".exe") ||
-      game.gameLink.startsWith("/api/games/assets"));
+      game.gameLink.startsWith("/api/games/assets") ||
+      game.gameLink.includes("/api/assets/") ||
+      game.gameLink.includes("drive.google.com/uc") ||
+      game.gameLink.includes("drive.google.com/file"));
 
   const isPlaceholderLink = !game.gameLink || game.gameLink === "#" || game.gameLink === "";
 
