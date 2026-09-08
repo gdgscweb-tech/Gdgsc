@@ -24,18 +24,13 @@ if (environment === "production") {
 
 console.log(`\n🔧 Running in ${environment.toUpperCase()} mode\n`);
 
-const { getMongoUri } = require("./src/config/db");
-
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    const mongoUri = getMongoUri();
-    await mongoose.connect(mongoUri);
-    console.log(
-      `✅ MongoDB connected successfully to: ${mongoose.connection.name}`,
-    );
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB connected successfully");
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error.message);
+    console.error("❌ MongoDB connection error:", error);
     process.exit(1);
   }
 };

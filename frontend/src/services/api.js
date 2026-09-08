@@ -15,6 +15,24 @@ const API_BASE_URL = isProduction
     "https://gdgsc-33246d1cdab1.herokuapp.com"
   : process.env.REACT_APP_DEV_API_URL || "http://localhost:5000";
 
+// Game data stores backend paths so the same JSON works in every environment.
+// Resolve those paths against the API host before assigning them to media links.
+export const resolveApiUrl = (value) => {
+  if (!value || typeof value !== "string") return value;
+  if (/^(?:https?:|data:|blob:)/i.test(value)) return value;
+  if (value.startsWith("/")) {
+    return `${API_BASE_URL.replace(/\/$/, "")}${value}`;
+  }
+  return value;
+};
+
+export const isDownloadUrl = (value) => {
+  const url = resolveApiUrl(value);
+  return Boolean(url) &&
+    (url.includes("download=true") ||
+      /\.(7z|apk|dmg|exe|rar|zip)(?:[?#]|$)/i.test(url));
+};
+
 console.log(
   `Frontend running in ${isProduction ? "production" : "development"} mode`
 );

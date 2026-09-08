@@ -149,6 +149,45 @@ exports.getDownloadUrl = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Stream a private Google Drive file through the configured storage API
+ * @route   GET /api/assets/drive/:fileId
+ * @access  Public app route; Drive credentials remain server-side
+ */
+exports.proxyDriveFile = asyncHandler(async (req, res) => {
+  const result = await assetService.getDriveFileStream({
+    fileId: req.params.fileId,
+    range: req.headers.range,
+  });
+
+  const headersToForward = [
+    "accept-ranges",
+    "content-length",
+    "content-range",
+    "content-type",
+    "etag",
+    "last-modified",
+  ];
+  headersToForward.forEach((header) => {
+    if (result.headers[header]) res.setHeader(header, result.headers[header]);
+  });
+
+  if (req.query.download === "true") {
+    const requestedName = String(req.query.filename || `drive-${req.params.fileId}`)
+      .replace(/[\\"\r\n]/g, "")
+      .slice(0, 180);
+    res.setHeader("Content-Disposition", `attachment; filename=\"${requestedName}\"`);
+  } else if (req.query.cache === "team") {
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=86400, stale-while-revalidate=604800",
+    );
+  }
+
+  res.status(result.status);
+  result.data.pipe(res);
+});
+
+/**
  * @desc    Get asset metadata by ID
  * @route   GET /api/assets/:assetId
  * @access  Public / Private

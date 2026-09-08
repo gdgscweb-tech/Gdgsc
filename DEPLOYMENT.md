@@ -50,9 +50,9 @@ Vercel will automatically use `.env.production` for production builds.
 
 Set these environment variables in your Render dashboard:
 
-```env
+```
 NODE_ENV=production
-PROD_MONGO_URI=your_production_mongodb_connection_string
+MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 SESSION_SECRET=your_session_secret
 GOOGLE_CLIENT_ID=your_google_client_id
@@ -60,13 +60,15 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 PROD_FRONTEND_URL=https://your-vercel-domain.vercel.app
-PROD_BACKEND_URL=https://api.gdgsc.dev
-PROD_GOOGLE_CALLBACK_URL=https://api.gdgsc.dev/api/auth/google/callback
-PROD_DISCORD_CALLBACK_URL=https://api.gdgsc.dev/api/auth/discord/callback
+PROD_BACKEND_URL=https://gdgsc-33246d1cdab1.herokuapp.com
+PROD_GOOGLE_CALLBACK_URL=https://gdgsc-33246d1cdab1.herokuapp.com/api/auth/google/callback
+PROD_DISCORD_CALLBACK_URL=https://gdgsc-33246d1cdab1.herokuapp.com/api/auth/discord/callback
+DEV_FRONTEND_URL=http://localhost:3000
+DEV_BACKEND_URL=http://localhost:5000
+DEV_GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+DEV_DISCORD_CALLBACK_URL=http://localhost:5000/api/auth/discord/callback
 PORT=5000
 ```
-
-> **Database Isolation Note**: The backend automatically chooses `DEV_MONGO_URI` (or local fallback) when `NODE_ENV=development` and `PROD_MONGO_URI` when `NODE_ENV=production`. Running locally will never accidentally connect to or wipe the production database.
 
 ## Local Development
 

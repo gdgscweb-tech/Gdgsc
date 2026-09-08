@@ -62,6 +62,10 @@ const GameSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    videos: {
+      type: [String],
+      default: [],
+    },
     gameLink: {
       type: String, // External link, direct download URL, or placeholder
       default: "",

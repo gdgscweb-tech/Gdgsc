@@ -1,6 +1,7 @@
 import React from "react";
 import "./Gamescard.css";
-import { Sparkles, Monitor, Smartphone, Globe, Gamepad2, Download, Play, SearchX, Eye, ArrowUpRight } from "lucide-react";
+import { Sparkles, Monitor, Smartphone, Globe, Gamepad2, Download, Play, SearchX } from "lucide-react";
+import { isDownloadUrl, resolveApiUrl } from "../services/api";
 
 // Platform icon helper
 const getPlatformIcon = (platform) => {
@@ -52,11 +53,7 @@ const Gamescard = ({
       <div className="store-games-grid">
         {games.length > 0 ? (
           games.map((game) => {
-            const isDownload =
-              game.gameLink &&
-              (game.gameLink.endsWith(".rar") ||
-                game.gameLink.endsWith(".zip") ||
-                game.gameLink.endsWith(".exe"));
+            const isDownload = isDownloadUrl(game.gameLink);
 
             return (
               <div
@@ -74,7 +71,7 @@ const Gamescard = ({
                 {/* Artwork Container */}
                 <div className="card-artwork-wrapper">
                   <img
-                    src={game.image}
+                    src={resolveApiUrl(game.image)}
                     alt={game.title}
                     className="card-artwork-img"
                     onError={(e) => {
@@ -93,19 +90,6 @@ const Gamescard = ({
                     )}
                   </div>
 
-                  {/* Hover Quick Action Layer */}
-                  <div className="card-hover-action-layer">
-                    <button
-                      className="card-quick-action-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onGameClick(game);
-                      }}
-                    >
-                      <Eye size={15} />
-                      <span>View Details</span>
-                    </button>
-                  </div>
                 </div>
 
                 {/* Card Metadata Details */}

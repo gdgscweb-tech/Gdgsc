@@ -64,7 +64,7 @@ Production-ready, high-performance object storage and asset management API for g
    - **Account ID** (found on R2 overview page)
    - **Access Key ID**
    - **Secret Access Key**
-5. _(Optional for Public Assets)_ Under Bucket Settings > **Public Access**, enable **Custom Domain** (e.g. `assets.gdgsc.dev`) or **R2.dev subdomain**.
+5. _(Optional for Public Assets)_ Under Bucket Settings > **Public Access**, enable **Custom Domain** (e.g. `assets.gdgsc.tech`) or **R2.dev subdomain**.
 
 ---
 
@@ -79,6 +79,8 @@ In Cloudflare Dashboard: **Bucket** > **Settings** > **CORS Policy** > **Edit JS
   {
     "AllowedOrigins": [
       "http://localhost:3000",
+      "https://www.gdgsc.tech",
+      "https://gdgsc.tech",
       "https://www.gdgsc.dev",
       "https://gdgsc.dev"
     ],

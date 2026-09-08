@@ -1,140 +1,156 @@
 // backend/server.js
 
-const express = require('express');
-const dotenv = require('dotenv');
-const connectDB = require('./src/config/db');
-const { getMongoUri } = require('./src/config/db');
-const cors = require('cors');
-const passport = require('passport');
-const path = require('path');
-const session = require('express-session'); // Required for Passport OAuth
-const MongoStore = require('connect-mongo'); // To store sessions in MongoDB
-const errorHandler = require('./src/middleware/errorHandler');
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDB = require("./src/config/db");
+const { getMongoUri } = require("./src/config/db");
+const cors = require("cors");
+const passport = require("passport");
+const path = require("path");
+const session = require("express-session"); // Required for Passport OAuth
+const MongoStore = require("connect-mongo"); // To store sessions in MongoDB
+const errorHandler = require("./src/middleware/errorHandler");
 
 // Load environment variables
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Environment-based configuration
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 const gamesFlag = process.env.ENABLE_GAMES;
-const isGamesEnabled = gamesFlag === 'true' || (gamesFlag !== 'false' && !isProduction);
+const isGamesEnabled =
+  gamesFlag === "true" || (gamesFlag !== "false" && !isProduction);
 
 const config = {
-    frontendUrl: isProduction ? process.env.PROD_FRONTEND_URL : process.env.DEV_FRONTEND_URL,
-    backendUrl: isProduction ? process.env.PROD_BACKEND_URL : process.env.DEV_BACKEND_URL,
-    googleCallbackUrl: isProduction ? process.env.PROD_GOOGLE_CALLBACK_URL : process.env.DEV_GOOGLE_CALLBACK_URL,
-    discordCallbackUrl: isProduction ? process.env.PROD_DISCORD_CALLBACK_URL : process.env.DEV_DISCORD_CALLBACK_URL,
+  frontendUrl: isProduction
+    ? process.env.PROD_FRONTEND_URL
+    : process.env.DEV_FRONTEND_URL,
+  backendUrl: isProduction
+    ? process.env.PROD_BACKEND_URL
+    : process.env.DEV_BACKEND_URL,
+  googleCallbackUrl: isProduction
+    ? process.env.PROD_GOOGLE_CALLBACK_URL
+    : process.env.DEV_GOOGLE_CALLBACK_URL,
+  discordCallbackUrl: isProduction
+    ? process.env.PROD_DISCORD_CALLBACK_URL
+    : process.env.DEV_DISCORD_CALLBACK_URL,
 };
 
-if (process.env.NODE_ENV !== 'test') {
-    console.log(`Running in ${process.env.NODE_ENV || 'development'} mode`);
-    console.log(`Frontend URL: ${config.frontendUrl}`);
-    console.log(`Backend URL: ${config.backendUrl}`);
-    console.log(`Games feature enabled: ${isGamesEnabled}`);
+if (process.env.NODE_ENV !== "test") {
+  console.log(`Running in ${process.env.NODE_ENV} mode`);
+  console.log(`Frontend URL: ${config.frontendUrl}`);
+  console.log(`Backend URL: ${config.backendUrl}`);
+  console.log(`Games feature enabled: ${isGamesEnabled}`);
 }
 
 // Passport config
-require('./src/config/passport')(passport);
+require("./src/config/passport")(passport);
 
-// Connect to database (only if not in test)
-if (process.env.NODE_ENV !== 'test') {
-    connectDB();
+// Connect to database (only if not in test or if test explicitly handles db)
+if (process.env.NODE_ENV !== "test") {
+  connectDB();
 }
 
 const app = express();
 
 // CORS Middleware - Environment dependent
 const allowedOrigins = isProduction
-    ? [
-        'https://gdgsc.dev',
-        'https://www.gdgsc.dev',
-        config.frontendUrl, // Include the configured frontend URL
-        process.env.PROD_FRONTEND_URL, // Include env variable for safety
+  ? [
+      "https://gdgsc.tech",
+      "https://www.gdgsc.tech",
+      "https://gdgsc.dev",
+      "https://www.gdgsc.dev",
+      config.frontendUrl, // Include the configured frontend URL
+      process.env.PROD_FRONTEND_URL, // Include env variable for safety
     ].filter(Boolean)
-    : [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        config.frontendUrl,
-        process.env.DEV_FRONTEND_URL,
+  : [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      config.frontendUrl,
+      process.env.DEV_FRONTEND_URL,
     ].filter(Boolean);
 
-app.use(cors({
+app.use(
+  cors({
     origin: allowedOrigins,
     credentials: true, // Allow cookies/headers to be sent
-}));
+  }),
+);
 
 // Body parser middleware
 app.use(express.json()); // For JSON data
 app.use(express.urlencoded({ extended: false })); // For form data
 
 // Session Middleware (needed for Passport.js OAuth flows)
-if (process.env.NODE_ENV !== 'test') {
-    try {
-        const mongoUrl = getMongoUri();
-        app.use(
-            session({
-                secret: process.env.SESSION_SECRET || 'gdgsc_session_secret',
-                resave: false,
-                saveUninitialized: false,
-                store: MongoStore.create({
-                    mongoUrl: mongoUrl,
-                    collectionName: 'sessions',
-                    ttl: 14 * 24 * 60 * 60,
-                    autoRemove: 'interval',
-                    autoRemoveInterval: 10,
-                }),
-                cookie: {
-                    maxAge: 1000 * 60 * 60 * 24,
-                    secure: process.env.NODE_ENV === 'production',
-                    httpOnly: true,
-                    sameSite: 'lax',
-                },
-            })
-        );
-    } catch (err) {
-        console.warn(`Session store initialization warning: ${err.message}`);
-    }
+if (process.env.NODE_ENV !== "test") {
+  try {
+    const mongoUrl = getMongoUri();
+    app.use(
+      session({
+        secret: process.env.SESSION_SECRET || "gdgsc_session_secret",
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+          mongoUrl: mongoUrl,
+          collectionName: "sessions",
+          ttl: 14 * 24 * 60 * 60,
+          autoRemove: "interval",
+          autoRemoveInterval: 10,
+        }),
+        cookie: {
+          maxAge: 1000 * 60 * 60 * 24,
+          secure: process.env.NODE_ENV === "production",
+          httpOnly: true,
+          sameSite: "lax",
+        },
+      }),
+    );
+  } catch (err) {
+    console.warn(`Session store initialization warning: ${err.message}`);
+  }
 }
 
 // Passport middleware
 app.use(passport.initialize());
-if (process.env.NODE_ENV !== 'test') {
-    app.use(passport.session());
+if (process.env.NODE_ENV !== "test" && process.env.MONGO_URI) {
+  app.use(passport.session());
 }
 
 // Routes
-app.use('/api/auth', require('./src/routes/authRoutes'));
-app.use('/api/user', require('./src/routes/userRoutes'));
-app.use('/api/events', require('./src/routes/eventRoutes'));
-app.use('/api/registrations', require('./src/routes/registrationRoutes'));
+app.use("/api/auth", require("./src/routes/authRoutes"));
+app.use("/api/user", require("./src/routes/userRoutes"));
+app.use("/api/events", require("./src/routes/eventRoutes"));
+app.use("/api/registrations", require("./src/routes/registrationRoutes"));
 
 // Game Assets & File Storage Routes
-app.use('/api/assets', require('./src/routes/assetRoutes'));
+app.use("/api/assets", require("./src/routes/assetRoutes"));
 
 if (isGamesEnabled) {
-    // Serve legacy local game assets as static fallback if needed
-    app.use('/api/games/assets', express.static(path.join(__dirname, 'src/games')));
-    app.use('/api/games', require('./src/routes/gamesRoutes'));
+  // Serve legacy local game assets as static fallback if needed
+  app.use(
+    "/api/games/assets",
+    express.static(path.join(__dirname, "src/games")),
+  );
+  app.use("/api/games", require("./src/routes/gamesRoutes"));
 } else {
-    app.use('/api/games/assets', (_req, res) => {
-        res.status(404).json({ message: 'Games are not live yet.' });
-    });
-    app.use('/api/games', (_req, res) => {
-        res.status(404).json({ message: 'Games are not live yet.' });
-    });
+  app.use("/api/games/assets", (_req, res) => {
+    res.status(404).json({ message: "Games are not live yet." });
+  });
+  app.use("/api/games", (_req, res) => {
+    res.status(404).json({ message: "Games are not live yet." });
+  });
 }
 
 // Serve frontend in production (if applicable)
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/build')));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-    app.get('*', (req, res) =>
-        res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'))
-    );
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html")),
+  );
 } else {
-    app.get('/', (req, res) => {
-        res.send('API is running...');
-    });
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
 }
 
 // Global error handler
@@ -142,8 +158,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 module.exports = app;

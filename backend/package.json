@@ -7,6 +7,8 @@
     "dev": "nodemon server.js",
     "seed": "node seed.js",
     "load-games": "node src/utils/loadGames.js",
+    "sync-games-drive-urls": "node src/utils/syncGamesWithGoogleDrive.js",
+    "sync-team-images-drive": "node src/utils/syncTeamImagesWithGoogleDrive.js",
     "optimize-images": "node src/utils/optimizeImages.js",
     "test": "jest --runInBand --detectOpenHandles"
   },

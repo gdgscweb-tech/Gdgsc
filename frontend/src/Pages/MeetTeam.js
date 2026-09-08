@@ -1,6 +1,13 @@
 import React from "react";
 import "./MeetTeam.css";
 import { FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa";
+import { resolveApiUrl } from "../services/api";
+import teamAssetManifest from "../data/teamAssetManifest";
+
+const TEAM_FALLBACK = "/images/meetteam/fallback-image.jpg";
+
+const resolveTeamPhoto = (photo) =>
+  resolveApiUrl(teamAssetManifest[photo] || teamAssetManifest[TEAM_FALLBACK] || photo);
 
 const MeetTeam = () => {
   const teams = [
@@ -626,17 +633,16 @@ const MeetTeam = () => {
                   <div className="member-image-container">
                     <div className="image-wrapper">
                       {member.photo !== '' ? <img
-                        src={member.photo}
-                        onerror="this.onerror=null; this.src='/images/meetteam/fallback-image.jpg';"
+                        src={resolveTeamPhoto(member.photo)}
                         alt={member.name}
                         className="member-image"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = "/images/meetteam/fallback-image.jpg";
+                          e.target.src = resolveTeamPhoto(TEAM_FALLBACK);
                         }}
                       />:
                       <img
-                        src="/images/meetteam/fallback-image.jpg"
+                        src={resolveTeamPhoto(TEAM_FALLBACK)}
                         alt={member.name}
                         className="member-image"
                       />

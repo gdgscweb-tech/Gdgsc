@@ -4,14 +4,15 @@
   "fullStory": "ClashGo is a competitive strategy fighting game built on the Solana blockchain. Collect and upgrade powerful fighters — from the electrifying Thunder Breaker to the mighty Earth Titan — each with unique stats for health, attack, defense, and speed. Choose your battlefield, pick your combat style (light, heavy, special, or block), and engage in fast-paced 1v1 battles, ranked matches, or multi-player tournaments. The game also features a built-in quiz system to test your crypto knowledge and earn bonus rewards. With stunning fantasy art, deep strategic gameplay, and real SOL prizes on the line, ClashGo brings the thrill of competitive gaming to Web3.",
   "genre": "Action",
   "developer": "GDGSC",
-  "image": "/api/games/assets/ClashGo/clash1.webp",
+  "image": "/api/assets/drive/1wwI8lfr5q9Kssfa_LkyRNffuYqc0x8-7",
   "screenshots": [
-    "/api/games/assets/ClashGo/clash2.webp",
-    "/api/games/assets/ClashGo/clash3.webp",
-    "/api/games/assets/ClashGo/clash4.webp",
-    "/api/games/assets/ClashGo/clash5.webp",
-    "/api/games/assets/ClashGo/clash6.webp"
+    "/api/assets/drive/1-7rYev9DoUZNdULrsVS_JmOSHOxyZALK",
+    "/api/assets/drive/11xwt_GbhVbeScoeU-MoZyxBGP456jofj?download=true&filename=clash3.webp",
+    "/api/assets/drive/1B6Kpaa-UlBe4GYq9JZVppefBAn8HpY3L?download=true&filename=clash4.webp",
+    "/api/assets/drive/16YKxfPMF54_G2Fh7xCL4ylNOv7b2g3Hb?download=true&filename=clash5.webp",
+    "/api/assets/drive/18pxPlXZnLQ5Jyi3l58W56ybEeptupoAj?download=true&filename=clash6.webp"
   ],
+  "videos": [],
   "gameLink": "https://clashgo.vercel.app",
   "platforms": [
     "Web",

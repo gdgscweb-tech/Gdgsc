@@ -1,12 +1,9 @@
 // backend/tests/dbConfig.test.js
 
-const { getMongoUri } = require("../src/config/db");
-
 describe("Database Environment Separation Unit Tests", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
     process.env = { ...originalEnv };
     delete process.env.DEV_MONGO_URI;
     delete process.env.PROD_MONGO_URI;
@@ -19,6 +16,10 @@ describe("Database Environment Separation Unit Tests", () => {
     process.env = originalEnv;
   });
 
+  const getDbHelper = () => {
+    return require("../src/config/db");
+  };
+
   describe("Development Environment (NODE_ENV=development)", () => {
     beforeEach(() => {
       process.env.NODE_ENV = "development";
@@ -30,11 +31,13 @@ describe("Database Environment Separation Unit Tests", () => {
       process.env.PROD_MONGO_URI =
         "mongodb://produser:prodpass@prodhost:27017/gdgsc_prod";
 
+      const { getMongoUri } = getDbHelper();
       const uri = getMongoUri();
       expect(uri).toBe("mongodb://devuser:devpass@devhost:27017/gdgsc_dev");
     });
 
     test("falls back safely to local development database if DEV_MONGO_URI is unset", () => {
+      const { getMongoUri } = getDbHelper();
       const uri = getMongoUri();
       expect(uri).toBe("mongodb://127.0.0.1:27017/gdgsc_dev");
     });
@@ -44,6 +47,7 @@ describe("Database Environment Separation Unit Tests", () => {
         "mongodb://produser:prodpass@prodhost:27017/gdgsc_prod";
       delete process.env.DEV_MONGO_URI;
 
+      const { getMongoUri } = getDbHelper();
       const uri = getMongoUri();
       expect(uri).not.toBe(
         "mongodb://produser:prodpass@prodhost:27017/gdgsc_prod",
@@ -63,6 +67,7 @@ describe("Database Environment Separation Unit Tests", () => {
       process.env.PROD_MONGO_URI =
         "mongodb://produser:prodpass@prodhost:27017/gdgsc_prod";
 
+      const { getMongoUri } = getDbHelper();
       const uri = getMongoUri();
       expect(uri).toBe("mongodb://produser:prodpass@prodhost:27017/gdgsc_prod");
     });
@@ -71,6 +76,7 @@ describe("Database Environment Separation Unit Tests", () => {
       process.env.MONGO_URI =
         "mongodb+srv://render_prod:secret@cluster.mongodb.net/gdgsc";
 
+      const { getMongoUri } = getDbHelper();
       const uri = getMongoUri();
       expect(uri).toBe(
         "mongodb+srv://render_prod:secret@cluster.mongodb.net/gdgsc",
@@ -84,6 +90,7 @@ describe("Database Environment Separation Unit Tests", () => {
       process.env.DEV_MONGO_URI =
         "mongodb://devuser:devpass@devhost:27017/gdgsc_dev";
 
+      const { getMongoUri } = getDbHelper();
       expect(() => getMongoUri()).toThrow(
         /FATAL: Production MongoDB URI is not configured/,
       );
@@ -93,6 +100,7 @@ describe("Database Environment Separation Unit Tests", () => {
       delete process.env.PROD_MONGO_URI;
       delete process.env.MONGO_URI;
 
+      const { getMongoUri } = getDbHelper();
       expect(() => getMongoUri()).toThrow();
     });
   });
@@ -104,6 +112,7 @@ describe("Database Environment Separation Unit Tests", () => {
 
     test("resolves to TEST_MONGO_URI or test fallback", () => {
       process.env.TEST_MONGO_URI = "mongodb://testhost:27017/my_test_db";
+      const { getMongoUri } = getDbHelper();
       expect(getMongoUri()).toBe("mongodb://testhost:27017/my_test_db");
 
       delete process.env.TEST_MONGO_URI;

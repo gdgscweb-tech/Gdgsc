@@ -430,6 +430,31 @@ class GoogleDriveStorageService extends IStorageService {
   }
 
   /**
+   * Streams a private Drive file through the backend without exposing Drive credentials.
+   * Supports HTTP range requests for video playback and resumable downloads.
+   */
+  async getFileStream({ fileId, range }) {
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      throw new Error("A valid Google Drive file ID is required");
+    }
+
+    const token = await this.getAccessToken();
+    if (!token) throw new Error("Google Drive credentials are not configured");
+
+    const headers = { Authorization: `Bearer ${token}` };
+    if (range) headers.Range = range;
+
+    return this.httpClient.get(
+      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
+      {
+        headers,
+        responseType: "stream",
+        validateStatus: (status) => status === 200 || status === 206,
+      },
+    );
+  }
+
+  /**
    * Returns a direct public link for viewing or embedding.
    * Uses Google CDN thumbnail / preview for images and uc export for downloads.
    */

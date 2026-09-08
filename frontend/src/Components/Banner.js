@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Banner.css";
 import { Download, ExternalLink, Sparkles, Monitor, Smartphone, Globe, Gamepad2, ChevronRight, Play } from "lucide-react";
+import { isDownloadUrl, resolveApiUrl } from "../services/api";
 
 // Platform icon helper
 const getPlatformIcon = (platform) => {
@@ -46,11 +47,7 @@ const Banner = ({ games = [], onGameClick }) => {
 
   const current = featuredGames[currentIndex] || featuredGames[0];
 
-  const isDownload = current.gameLink && (
-    current.gameLink.endsWith(".rar") ||
-    current.gameLink.endsWith(".zip") ||
-    current.gameLink.endsWith(".exe")
-  );
+  const isDownload = isDownloadUrl(current.gameLink);
 
   return (
     <div
@@ -63,7 +60,7 @@ const Banner = ({ games = [], onGameClick }) => {
         {/* Background Image with Ambient Glow */}
         <div className="hero-bg-layer">
           <img
-            src={current.image}
+            src={resolveApiUrl(current.image)}
             alt={current.title}
             className="hero-bg-img"
             key={`bg-${currentIndex}`}
@@ -154,7 +151,7 @@ const Banner = ({ games = [], onGameClick }) => {
 
               <div className="thumb-img-wrapper">
                 <img
-                  src={game.image}
+                  src={resolveApiUrl(game.image)}
                   alt={game.title}
                   onError={(e) => {
                     e.target.onerror = null;

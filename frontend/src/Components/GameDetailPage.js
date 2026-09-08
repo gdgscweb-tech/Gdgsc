@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import DetailCarousel from "./DetailCarousel";
+import { resolveApiUrl } from "../services/api";
 import {
   ArrowLeft,
   Download,
@@ -40,13 +41,23 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
   const screenshots = useMemo(() => {
     if (!game) return [];
     if (game.screenshots && game.screenshots.length > 0) {
-      return game.screenshots;
+      return game.screenshots.map(resolveApiUrl);
     }
     if (game.image) {
-      return [game.image];
+      return [resolveApiUrl(game.image)];
     }
     return [];
   }, [game]);
+
+  const mediaItems = useMemo(
+    () => [
+      ...screenshots.map((url) => ({ url, isVideo: false })),
+      ...(Array.isArray(game.videos) ? game.videos : [])
+        .filter(Boolean)
+        .map((url) => ({ url: resolveApiUrl(url), isVideo: true })),
+    ],
+    [game.videos, screenshots],
+  );
 
   // Compute related games (same genre or other titles excluding current)
   const relatedGames = useMemo(() => {
@@ -56,37 +67,36 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
         (g._id || g.id) !== (game._id || game.id) &&
         g.genre &&
         game.genre &&
-        g.genre.toLowerCase() === game.genre.toLowerCase()
+        g.genre.toLowerCase() === game.genre.toLowerCase(),
     );
     if (sameGenre.length >= 3) return sameGenre.slice(0, 4);
 
     const otherGames = allGames.filter(
-      (g) => (g._id || g.id) !== (game._id || game.id)
+      (g) => (g._id || g.id) !== (game._id || game.id),
     );
     return otherGames.slice(0, 4);
   }, [allGames, game]);
 
   if (!game) return null;
 
+  const resolvedGameLink = resolveApiUrl(game.gameLink);
   const isDownloadLink =
-    game.gameLink &&
-    (game.gameLink.endsWith(".rar") ||
-      game.gameLink.endsWith(".zip") ||
-      game.gameLink.endsWith(".exe") ||
-      game.gameLink.startsWith("/api/games/assets"));
-      game.gameLink.startsWith("/api/games/assets") ||
-      game.gameLink.includes("/api/assets/") ||
-      game.gameLink.includes("drive.google.com/uc") ||
-      game.gameLink.includes("drive.google.com/file"));
+    Boolean(resolvedGameLink) &&
+    (resolvedGameLink.startsWith("/api/games/assets") ||
+      resolvedGameLink.includes("/api/assets/") ||
+      resolvedGameLink.includes("drive.google.com/uc") ||
+      resolvedGameLink.includes("drive.google.com/file") ||
+      /\.(7z|apk|dmg|exe|rar|zip)(?:[?#]|$)/i.test(resolvedGameLink));
 
-  const isPlaceholderLink = !game.gameLink || game.gameLink === "#" || game.gameLink === "";
+  const isPlaceholderLink =
+    !game.gameLink || game.gameLink === "#" || game.gameLink === "";
 
   const handleActionClick = () => {
     if (isPlaceholderLink) return;
 
     if (isDownloadLink) {
       const link = document.createElement("a");
-      link.href = game.gameLink;
+      link.href = resolvedGameLink;
       link.setAttribute("download", game.gameFile || `${game.title}.rar`);
       document.body.appendChild(link);
       link.click();
@@ -147,6 +157,7 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
           {/* Master Media Showcase */}
           <DetailCarousel
             screenshots={screenshots}
+            mediaItems={mediaItems}
             gameTitle={game.title}
           />
 
@@ -179,7 +190,7 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
           <div className="detail-action-card">
             <div className="action-card-cover-wrapper">
               <img
-                src={game.image}
+                src={resolveApiUrl(game.image)}
                 alt={game.title}
                 className="action-card-cover-img"
                 onError={(e) => {
@@ -321,7 +332,7 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
               >
                 <div className="related-art-wrap">
                   <img
-                    src={relGame.image}
+                    src={resolveApiUrl(relGame.image)}
                     alt={relGame.title}
                     onError={(e) => {
                       e.target.onerror = null;

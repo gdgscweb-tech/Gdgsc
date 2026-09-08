@@ -101,7 +101,7 @@
 .card-artwork-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -146,53 +146,6 @@
   height: 24px;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-/* Hover Action Layer */
-.card-hover-action-layer {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 8, 12, 0.65);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  z-index: 4;
-}
-
-.store-game-card:hover .card-hover-action-layer {
-  opacity: 1;
-}
-
-.card-quick-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.15rem;
-  background: #ffd700;
-  color: #08080c;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  transform: translateY(6px);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.store-game-card:hover .card-quick-action-btn {
-  transform: translateY(0);
-}
-
-.card-quick-action-btn:hover {
-  background: #ffffff;
-  transform: scale(1.05);
 }
 
 /* Details Box */
@@ -387,8 +340,5 @@
     gap: 0.4rem;
   }
 
-  .card-hover-action-layer {
-    display: none;
-  }
 }
 

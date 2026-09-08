@@ -224,7 +224,7 @@
 .action-card-cover-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .action-card-cover-overlay {
@@ -443,7 +443,7 @@
 .related-art-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s ease;
 }
 

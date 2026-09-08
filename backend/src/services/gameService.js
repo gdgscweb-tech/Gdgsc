@@ -103,6 +103,7 @@ class GameService {
         data.image ||
         "https://images.unsplash.com/photo-1542751371-adc38448a05e",
       screenshots: Array.isArray(data.screenshots) ? data.screenshots : [],
+      videos: Array.isArray(data.videos) ? data.videos : [],
       gameLink: data.gameLink || "",
       platforms: Array.isArray(data.platforms) ? data.platforms : ["Windows"],
       gameFolder: data.gameFolder,
@@ -147,6 +148,7 @@ class GameService {
     if (updates.image !== undefined) game.image = updates.image;
     if (updates.screenshots !== undefined)
       game.screenshots = updates.screenshots;
+    if (updates.videos !== undefined) game.videos = updates.videos;
     if (updates.gameLink !== undefined) game.gameLink = updates.gameLink;
     if (updates.platforms !== undefined) game.platforms = updates.platforms;
     if (updates.info !== undefined)

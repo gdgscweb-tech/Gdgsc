@@ -1,9 +1,11 @@
 /frontend/node_modules
+/frontend/.team-assets-local-backup
 /backend/node_modules
 /.cache
 node_modules
 # Environment files with secrets (keep .env.production and .env.development for deployment)
 backend/.env
+backend/google-drive-service-account.json
 frontend/.env
 
 # But allow environment templates

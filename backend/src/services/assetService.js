@@ -565,6 +565,10 @@ class AssetService {
     };
   }
 
+  async getDriveFileStream({ fileId, range }) {
+    return this.storage.getFileStream({ fileId, range });
+  }
+
   /**
    * Lists assets for a game with visibility filtering.
    */

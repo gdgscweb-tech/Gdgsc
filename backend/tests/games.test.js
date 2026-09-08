@@ -21,6 +21,7 @@ describe("GameService & Game Model Unit Tests", () => {
       genre: "Racing",
       developer: "GDGSC Guild",
       image: "https://cdn.example.com/cover.webp",
+      videos: ["https://cdn.example.com/trailer.mp4"],
     };
 
     const createdDoc = {
@@ -37,6 +38,11 @@ describe("GameService & Game Model Unit Tests", () => {
     const result = await gameService.createGame(gameData);
     expect(result.title).toBe("Chrono Drift 2026");
     expect(result.slug).toBe("chrono-drift-2026");
+    expect(Game.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        videos: ["https://cdn.example.com/trailer.mp4"],
+      }),
+    );
     expect(Game.create).toHaveBeenCalledTimes(1);
   });
 
@@ -70,6 +76,7 @@ describe("GameService & Game Model Unit Tests", () => {
       _id: "66d000000000000000000003",
       title: "Old Title",
       description: "Old Desc",
+      videos: [],
       save: jest.fn().mockResolvedValue(true),
     };
 
@@ -80,10 +87,12 @@ describe("GameService & Game Model Unit Tests", () => {
     const updated = await gameService.updateGame("66d000000000000000000003", {
       title: "New Title",
       description: "New Description",
+      videos: ["/api/games/assets/Game/trailer.webm"],
     });
 
     expect(updated.title).toBe("New Title");
     expect(updated.description).toBe("New Description");
+    expect(updated.videos).toEqual(["/api/games/assets/Game/trailer.webm"]);
     expect(mockGame.save).toHaveBeenCalledTimes(1);
   });
 
