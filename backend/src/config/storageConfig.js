@@ -12,6 +12,18 @@ const parseEnvInt = (val, fallback) => {
   return isNaN(parsed) ? fallback : parsed;
 };
 
+const sanitizePrivateKey = (val) => {
+  if (!val) return "";
+  let key = String(val).trim();
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ) {
+    key = key.slice(1, -1).trim();
+  }
+  return key.replace(/\\n/g, "\n").replace(/\r\n/g, "\n");
+};
+
 const storageConfig = {
   // Cloudflare R2 Credentials & Endpoints
   // Storage Provider ('google_drive' | 'r2')
@@ -22,7 +34,7 @@ const storageConfig = {
     folderId: process.env.GOOGLE_DRIVE_FOLDER_ID || "",
     teamFolderId: process.env.GOOGLE_DRIVE_TEAM_FOLDER_ID || "",
     clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL || "",
-    privateKey: (process.env.GOOGLE_DRIVE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
+    privateKey: sanitizePrivateKey(process.env.GOOGLE_DRIVE_PRIVATE_KEY),
     clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "",
     clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "",
     refreshToken: process.env.GOOGLE_DRIVE_REFRESH_TOKEN || "",
