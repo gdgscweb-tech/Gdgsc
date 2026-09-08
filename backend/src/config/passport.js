@@ -51,7 +51,8 @@ module.exports = function(passport) {
     const googleCallbackUrl = isProduction ? process.env.PROD_GOOGLE_CALLBACK_URL : process.env.DEV_GOOGLE_CALLBACK_URL;
     const discordCallbackUrl = isProduction ? process.env.PROD_DISCORD_CALLBACK_URL : process.env.DEV_DISCORD_CALLBACK_URL;
 
-    passport.use(
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      passport.use(
         new GoogleStrategy({
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -100,10 +101,14 @@ module.exports = function(passport) {
                 return done(err, null);
             }
         })
-    );
+      );
+    } else {
+      console.warn('[Passport] Google OAuth credentials not set. Google login disabled.');
+    }
 
     // --- Discord Strategy ---
-    passport.use(
+    if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
+      passport.use(
         new DiscordStrategy({
             clientID: process.env.DISCORD_CLIENT_ID,
             clientSecret: process.env.DISCORD_CLIENT_SECRET,
@@ -153,5 +158,8 @@ module.exports = function(passport) {
                 return done(err, null);
             }
         })
-    );
+      );
+    } else {
+      console.warn('[Passport] Discord OAuth credentials not set. Discord login disabled.');
+    }
 };

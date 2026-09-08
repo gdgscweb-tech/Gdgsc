@@ -7,6 +7,7 @@ const { getMongoUri } = require("./src/config/db");
 const cors = require("cors");
 const passport = require("passport");
 const path = require("path");
+const fs = require("fs");
 const session = require("express-session"); // Required for Passport OAuth
 const MongoStore = require("connect-mongo"); // To store sessions in MongoDB
 const errorHandler = require("./src/middleware/errorHandler");
@@ -140,16 +141,25 @@ if (isGamesEnabled) {
   });
 }
 
-// Serve frontend in production (if applicable)
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
+// Health check route
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime(), timestamp: new Date() });
+});
+
+// Serve frontend in production (only if frontend build directory exists locally)
+const frontendBuildPath = path.resolve(__dirname, "../frontend/build");
+if (
+  process.env.NODE_ENV === "production" &&
+  fs.existsSync(path.join(frontendBuildPath, "index.html"))
+) {
+  app.use(express.static(frontendBuildPath));
 
   app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html")),
+    res.sendFile(path.join(frontendBuildPath, "index.html")),
   );
 } else {
   app.get("/", (req, res) => {
-    res.send("API is running...");
+    res.json({ status: "API is running...", service: "GDGSC Backend" });
   });
 }
 
