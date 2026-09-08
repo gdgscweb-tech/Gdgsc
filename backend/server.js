@@ -1,5 +1,17 @@
 // backend/server.js
 
+// Global safety net: prevent unhandled promise rejections (e.g., MongoDB DNS failures)
+// from crashing the Heroku dyno. Log them instead.
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[unhandledRejection] Unhandled promise rejection:", reason);
+  // Do NOT call process.exit() — let the server keep running
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException] Uncaught exception:", err.message);
+  // Do NOT exit for non-fatal errors; the server may continue to handle requests
+});
+
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./src/config/db");
@@ -48,7 +60,10 @@ require("./src/config/passport")(passport);
 
 // Connect to database (only if not in test or if test explicitly handles db)
 if (process.env.NODE_ENV !== "test") {
-  connectDB();
+  connectDB().catch((err) => {
+    console.error("[server] MongoDB connection failed at startup:", err.message);
+    // Do not exit — the server continues running so health checks and CORS still work
+  });
 }
 
 const app = express();
