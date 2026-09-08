@@ -8,9 +8,12 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
   const navigate = useNavigate();
   const now = new Date();
   const eventDate = new Date(event.date);
-  const eventEndDate = new Date(event.eventEndDate);
+  const eventEndDate = event.eventEndDate
+    ? new Date(event.eventEndDate)
+    : new Date(eventDate.getTime() + 24 * 60 * 60 * 1000);
   const regStartDate = new Date(event.registrationStartDate);
   const regEndDate = new Date(event.registrationEndDate);
+  const isPastEvent = now > eventEndDate;
 
   // Determine Event Status
   let statusBadge = null;
@@ -25,12 +28,13 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
   // Determine Registration Button State
   let buttonText = "Register Now";
   let isButtonDisabled = false;
-  let buttonVariant = "hexagon"; // Default variant
-
-  if (now < regStartDate) {
+  if (isPastEvent) {
+    buttonText = "Registration Closed";
+    isButtonDisabled = true;
+  } else if (now < regStartDate) {
     buttonText = "Registration Opens Soon";
     isButtonDisabled = true;
-  } else if (now > regEndDate) {
+  } else if (now > regEndDate || Number.isNaN(regStartDate.getTime()) || Number.isNaN(regEndDate.getTime())) {
     buttonText = "Registration Closed";
     isButtonDisabled = true;
   } else {
@@ -124,6 +128,7 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
         {/* Only show full description and actions if expanded */}
         {isExpanded && (
           <motion.div 
+            className="event-details"
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             transition={{ delay: 0.2 }}
