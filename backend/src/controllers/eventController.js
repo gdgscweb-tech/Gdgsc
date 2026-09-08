@@ -206,6 +206,7 @@ exports.getEvents = asyncHandler(async (req, res) => {
     // Optionally filter for active events for public view
     // const events = await Event.find({ isActive: true }).sort({ date: 1 });
     const events = await Event.find().sort({ date: 1 }); // Or get all, let frontend filter
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
     res.status(200).json(events);
 });
 
@@ -220,6 +221,7 @@ exports.getEventById = asyncHandler(async (req, res) => {
         throw new Error('Event not found');
     }
 
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
     res.status(200).json(event);
 });
 

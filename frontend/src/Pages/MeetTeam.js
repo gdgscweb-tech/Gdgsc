@@ -6,8 +6,12 @@ import teamAssetManifest from "../data/teamAssetManifest";
 
 const TEAM_FALLBACK = "/images/meetteam/fallback-image.jpg";
 
-const resolveTeamPhoto = (photo) =>
-  resolveApiUrl(teamAssetManifest[photo] || teamAssetManifest[TEAM_FALLBACK] || photo);
+const resolveTeamPhoto = (photo) => {
+  if (!photo) return resolveApiUrl(teamAssetManifest[TEAM_FALLBACK]);
+  const mapped = teamAssetManifest[photo];
+  if (mapped) return resolveApiUrl(mapped);
+  return resolveApiUrl(photo);
+};
 
 const MeetTeam = () => {
   const teams = [
@@ -47,13 +51,21 @@ const MeetTeam = () => {
           github: "#",
           photo: "/images/meetteam/OfficeBearers/JointSecretary/YashTohan.png",
         },
+        {
+          name: "Shraddha",
+          role: "PR",
+          linkedin: "#",
+          instagram: "#",
+          github: "#",
+          photo: "/images/meetteam/TeamOutreach/Shraddha.jpg",
+        },
       ],
     },
     {
       name: "Core Team",
       color: "team-white",
       members: [
-         {
+        {
           name: "Vedaant Budakoti",
           role: "Game Dev",
           linkedin: "https://www.linkedin.com/in/vedaantbudakoti/",
@@ -70,29 +82,67 @@ const MeetTeam = () => {
           photo: "/images/meetteam/TeamBlender/KavyaSharma1.jpg",
         },
         {
-          name: "Simant Pandit",
-          role: "Game Dev",
-          linkedin: "https://www.linkedin.com/in/simant-pandit-634a13312",
-          instagram: "https://www.instagram.com/simant._pandit/",
-          github: "https://github.com/Patagobhi",
-          photo: "/images/meetteam/TeamUnreal/SimantPandit1.jpg",
+          name: "Raghav Bhatia",
+          role: "3D Design",
+          linkedin: "https://www.linkedin.com/in/raghav-bhatia-775854214/",
+          instagram: "https://www.instagram.com/raghavbhatia.23/?hl=en",
+          github: "https://github.com/raghav-2310",
+          photo: "/images/meetteam/TeamBlender/RaghavBhatia.jpeg",
         },
         {
-          name: "Shubham Singh",
-          role: "Game Dev",
+          name: "Love Kumar",
+          role: "Events",
           linkedin: "#",
           instagram: "#",
-          github: "https://github.com/Shubhamkira10",
-          photo: "/images/meetteam/TeamUnreal/Shubham1.jpg",
-        }
-        
+          github: "#",
+          photo: "/images/meetteam/TeamOverwatch/Lovekumar(OVERWATCH).jpg",
+        },
+        {
+          name: "Divyanshu Choubey",
+          role: "PR",
+          linkedin: "#",
+          instagram: "#",
+          github: "#",
+          photo: "/images/meetteam/TeamOutreach/DivyanshuChoubey(Outreach).jpeg",
+        },
+        {
+          name: "Ojus Mathur",
+          role: "Research",
+          linkedin: "#",
+          instagram: "#",
+          github: "#",
+          photo: "/images/meetteam/TeamCatalyst/OJUSMATHUR(TeamCatalyst).jpeg",
+        },
+        {
+          name: "Rishit Kadha",
+          role: "WebDev",
+          linkedin: "#",
+          instagram: "https://www.instagram.com/rishit_kadha_?igsh=eGl3ZWw0cGx2ZWty",
+          github: "https://github.com/rishit-kadha",
+          photo: "/images/meetteam/TeamScratch/Rishit_Kadha1.jpg",
+        },
+        {
+          name: "Ishant Aggarwal",
+          role: "Prototyping",
+          linkedin: "#",
+          instagram: "#",
+          github: "#",
+          photo: "/images/meetteam/TeamPrototype/ISHANTAGGARWAL.jpg",
+        },
+        {
+          name: "Sambhav",
+          role: "Prototyping",
+          linkedin: "#",
+          instagram: "#",
+          github: "#",
+          photo: "/images/meetteam/TeamPrototype/sambhav1.jpg",
+        },
       ],
     },
     {
       name: "Team Unreal",
       color: "team-red",
       members: [
-       
         {
           name: "Aryan Kumar",
           role: "Game Dev",
@@ -118,36 +168,12 @@ const MeetTeam = () => {
           photo: "/images/meetteam/TeamUnreal/Pragyank.png",
         },
         {
-          name: "Shubh",
-          role: "Game Dev",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamUnreal/Shubh.jpeg",
-        },
-        {
           name: "Tushar",
           role: "Game Dev",
           linkedin: "#",
           instagram: "#",
           github: "#",
           photo: "/images/meetteam/TeamUnreal/Tushar-_-.jpg",
-        },
-        {
-          name: "Simant Pandit",
-          role: "Game Dev",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamUnreal/SimantPandit1.jpg",
-        },
-        {
-          name: "Shubham",
-          role: "Game Dev",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamUnreal/Shubham1.jpg",
         },
         {
           name: "Vichitra Verma",
@@ -165,14 +191,12 @@ const MeetTeam = () => {
           github: "https://github.com/Navneet1710",
           photo: "/images/meetteam/TeamUnreal/Navneet_.jpg",
         },
-        
       ],
     },
     {
       name: "Team Blender",
       color: "team-green",
       members: [
-        
         {
           name: "Saksham Aggarwal",
           role: "3D Design",
@@ -214,14 +238,6 @@ const MeetTeam = () => {
           photo: "/images/meetteam/TeamBlender/DhruvVashishthfinal.jpg",
         },
         {
-          name: "Kavya Sharma",
-          role: "3D Design",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamBlender/KavyaSharma1.jpg",
-        },
-        {
           name: "Lalit Kumar",
           role: "3D Design",
           linkedin: "#",
@@ -245,15 +261,6 @@ const MeetTeam = () => {
           github: "#",
           photo: "/images/meetteam/TeamBlender/VedPrakashSharma(TeamBlender).jpg",
         },
-        {
-          name: "Raghav Bhatia",
-          role: "3D Design",
-          linkedin: "https://www.linkedin.com/in/raghav-bhatia-775854214/",
-          instagram: "https://www.instagram.com/raghavbhatia.23/?hl=en",
-          github: "https://github.com/raghav-2310",
-          photo: "/images/meetteam/TeamBlender/RaghavBhatia.jpeg",
-        },
-        
       ],
     },
     {
@@ -293,14 +300,6 @@ const MeetTeam = () => {
           photo: "/images/meetteam/TeamOverwatch/Billy.jpg",
         },
         {
-          name: "Love Kumar",
-          role: "Events",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamOverwatch/Lovekumar(OVERWATCH).jpg",
-        },
-        {
           name: "Piyush Rana",
           role: "Events",
           linkedin: "#",
@@ -330,7 +329,6 @@ const MeetTeam = () => {
       name: "Team OutReach",
       color: "team-orange",
       members: [
-        
         {
           name: "Avani",
           role: "PR",
@@ -338,14 +336,6 @@ const MeetTeam = () => {
           instagram: "#",
           github: "#",
           photo: "/images/meetteam/TeamOutreach/Avani.jpg",
-        },
-        {
-          name: "Divyanshu Choubey",
-          role: "PR",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamOutreach/DivyanshuChoubey(Outreach).jpeg",
         },
         {
           name: "Harshita",
@@ -388,14 +378,6 @@ const MeetTeam = () => {
           photo: "/images/meetteam/TeamOutreach/Sanvi(Outreach).jpg",
         },
         {
-          name: "Shraddha",
-          role: "PR",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamOutreach/Shraddha.jpg",
-        },
-        {
           name: "Shubham",
           role: "PR",
           linkedin: "#",
@@ -432,14 +414,6 @@ const MeetTeam = () => {
           instagram: "#",
           github: "#",
           photo: "/images/meetteam/TeamCatalyst/MayankBisht(teamcatalyst).jpg",
-        },
-        {
-          name: "Ojus Mathur",
-          role: "Research",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamCatalyst/OJUSMATHUR(TeamCatalyst).jpeg",
         },
         {
           name: "Ujjwal",
@@ -495,14 +469,6 @@ const MeetTeam = () => {
           github: "#",
           photo: "/images/meetteam/TeamScratch/Utkarshh.jpg",
         },
-        {
-          name: "Rishit Kadha",
-          role: "WebDev",
-          linkedin: "#",
-          instagram: "https://www.instagram.com/rishit_kadha_?igsh=eGl3ZWw0cGx2ZWty",
-          github: "https://github.com/rishit-kadha",
-          photo: "/images/meetteam/TeamScratch/Rishit_Kadha1.jpg",
-        },
       ],
     },
     {
@@ -516,14 +482,6 @@ const MeetTeam = () => {
           instagram: "#",
           github: "#",
           photo: "/images/meetteam/TeamPrototype/CHIRAGMALVIYA.jpg",
-        },
-        {
-          name: "Ishant Aggarwal",
-          role: "Prototyping",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamPrototype/ISHANTAGGARWAL.png",
         },
         {
           name: "Kashvi",
@@ -540,14 +498,6 @@ const MeetTeam = () => {
           instagram: "#",
           github: "#",
           photo: "/images/meetteam/TeamPrototype/RashmayaVaidya.jpg",
-        },
-        {
-          name: "Sambhav",
-          role: "Prototyping",
-          linkedin: "#",
-          instagram: "#",
-          github: "#",
-          photo: "/images/meetteam/TeamPrototype/sambhav1.jpg",
         },
         {
           name: "Shashwat Shivam",
@@ -597,7 +547,7 @@ const MeetTeam = () => {
         },
         {
           name: "Shivank Verma",
-          role: "Prototyping",
+          role: "Theft",
           linkedin: "#",
           instagram: "#",
           github: "#",

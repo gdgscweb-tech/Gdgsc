@@ -4,6 +4,30 @@ import EventCard from "../Components/Cards/EventCard";
 import StayTuned from "./StayTuned";
 import { AnimatePresence, motion } from "framer-motion";
 
+const EVENTS_CACHE_KEY = "gdgsc:events:v1";
+const EVENTS_CACHE_TTL_MS = 60 * 1000;
+
+const readEventsCache = () => {
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(EVENTS_CACHE_KEY) || "null");
+    if (!cached || !Array.isArray(cached.events)) return null;
+    return cached;
+  } catch {
+    return null;
+  }
+};
+
+const writeEventsCache = (events) => {
+  try {
+    sessionStorage.setItem(
+      EVENTS_CACHE_KEY,
+      JSON.stringify({ events, cachedAt: Date.now() }),
+    );
+  } catch {
+    // Storage can be unavailable in private browsing; the network path still works.
+  }
+};
+
 const EventsPage = () => {
   const [ongoingEvents, setOngoingEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -15,19 +39,30 @@ const EventsPage = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
+      const cached = readEventsCache();
+      const cacheAge = cached ? Date.now() - cached.cachedAt : Infinity;
+
+      if (cached) {
+        categorizeEvents(cached.events);
+        setLoading(false);
+      }
+
+      if (cacheAge < EVENTS_CACHE_TTL_MS) return;
+
       try {
-        setLoading(true);
+        if (!cached) setLoading(true);
         const apiUrl = process.env.REACT_APP_ENV === 'production'
           ? process.env.REACT_APP_PROD_API_URL
           : process.env.REACT_APP_DEV_API_URL;
 
-        const response = await fetch(`${apiUrl}/api/events`);
+        const response = await fetch(`${apiUrl}/api/events`, { cache: "default" });
 
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
 
         const events = await response.json();
+        writeEventsCache(events);
         categorizeEvents(events);
       } catch (err) {
         setError(err.message);
