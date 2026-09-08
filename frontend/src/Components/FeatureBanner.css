@@ -1,130 +1,208 @@
-.categories {
-  padding: 0px 30px 40px;
-  margin: 0 30px;
+.categories-section {
+  max-width: 1440px;
+  margin: 0 auto 3rem auto;
+  padding: 0 2rem;
 }
 
-.section-title {
-  margin-bottom: 30px;
-  text-shadow: 20px solid gold;
+.section-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.section-header-title h3 {
+  font-family: 'Valorax', sans-serif;
+  font-size: 1.4rem;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.section-icon {
+  color: #ffd700;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Grid */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
 }
 
 .category-card {
   position: relative;
-  height: 180px;
-  border-radius: 12px;
+  height: 140px;
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s outline 0.3s;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); /* Added shadow */
-  outline: 1px solid rgba(55, 65, 81, 0.5);
-  outline-offset: 0px;
-}
-
-.category-card.is-selected {
-  outline: 2px solid rgba(255, 215, 0, 0.8);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-}
-.category-card.is-selected--reset {
-  outline: 2px solid rgba(255, 215, 0, 0.8);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-}
-.category-card--reset {
-  background: rgba(15, 15, 15, 0.8);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-/* Subtle gold line on top to match other cards */
-.category-card--reset::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
-}
-
-.category-card--reset h3 {
-  font-family: 'Valorax', sans-serif;
-  font-size: 1.25rem;
-  color: #ffd700;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  background: #11121a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .category-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-5px);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.category-card.is-selected {
+  border-color: #ffd700;
+  box-shadow: 0 0 0 2px #ffd700, 0 8px 30px rgba(255, 215, 0, 0.3);
+  transform: translateY(-3px);
 }
 
 .category-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
 
 .category-card:hover img {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .category-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.3) 50%,
-    transparent 100%
+    rgba(8, 8, 12, 0.95) 0%,
+    rgba(8, 8, 12, 0.5) 50%,
+    rgba(8, 8, 12, 0.1) 100%
   );
   display: flex;
   align-items: flex-end;
-  padding: 20px;
+  padding: 1rem 1.25rem;
 }
 
-.category-overlay h3 {
-  font-size: 18px;
+.category-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.category-text-wrap h4 {
+  font-family: 'Valorax', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
-@media (min-width: 1201px) {
-  /* Adjusted for 5 items (4 categories + SHOW ALL) on large screens */
-  .categories-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
+.category-card.is-selected .category-text-wrap h4 {
+  color: #ffd700;
 }
 
-@media (max-width: 1200px) {
-  .categories-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.category-explore-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 215, 0, 0.8);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  transition: transform 0.2s ease;
 }
 
+.category-card:hover .category-explore-hint {
+  transform: translateX(4px);
+  color: #ffd700;
+}
+
+/* ALL GENRES Card Specifics */
+.category-card--all {
+  background: linear-gradient(135deg, rgba(18, 19, 26, 0.9), rgba(28, 29, 42, 0.9));
+  border: 1px dashed rgba(255, 215, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.category-card--all.is-selected {
+  border-style: solid;
+  border-color: #ffd700;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(18, 19, 26, 0.95));
+}
+
+.category-all-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.all-genres-icon {
+  color: #ffd700;
+  margin-bottom: 0.2rem;
+  transition: transform 0.3s ease;
+}
+
+.category-card--all:hover .all-genres-icon {
+  transform: rotate(30deg) scale(1.1);
+}
+
+.category-all-content h4 {
+  font-family: 'Valorax', sans-serif;
+  font-size: 1.05rem;
+  color: #ffd700;
+  margin: 0;
+  letter-spacing: 1.2px;
+}
+
+.category-all-content span {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .categories {
-    padding: 0 20px 30px;
+  .categories-section {
+    padding: 0 1.25rem;
+    margin-bottom: 2rem;
   }
 
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 0.85rem;
   }
 
   .category-card {
-    height: 150px;
+    height: 120px;
+    border-radius: 10px;
+  }
+
+  .category-text-wrap h4 {
+    font-size: 0.9rem;
+  }
+
+  .section-subtitle {
+    display: none;
   }
 }
+

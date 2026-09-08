@@ -4,17 +4,18 @@
   "fullStory": "Char Parchi brings the beloved Indian parlour game to your phone. Four players are secretly assigned roles each round — Raja (King), Mantri (Minister), Chor (Thief), and Sipahi (Soldier). The Mantri must identify the Chor before time runs out, while the Chor tries to stay hidden. Points are awarded based on correct guesses and successful deception. With beautiful traditional Indian art, golden ornamental card designs, and a built-in voice chat system, Char Parchi makes game night effortless whether you're in the same room or miles apart. Play 10 rounds and see who reigns supreme!",
   "genre": "Casual",
   "developer": "GDGSC",
-  "image": "/api/games/assets/Char Parchi/cp1.webp",
+  "image": "/api/assets/drive/14QFYFX9mTnXdGbIUb7ZbZCGlew0YaXD-",
   "screenshots": [
-    "/api/games/assets/Char Parchi/cp2.webp",
-    "/api/games/assets/Char Parchi/cp3.webp",
-    "/api/games/assets/Char Parchi/cp4.webp",
-    "/api/games/assets/Char Parchi/cp5.webp",
-    "/api/games/assets/Char Parchi/cp6.webp",
-    "/api/games/assets/Char Parchi/cp7.webp",
-    "/api/games/assets/Char Parchi/cp8.webp",
-    "/api/games/assets/Char Parchi/cp9.webp"
+    "/api/assets/drive/1DPqOU6qzT7T6aZk8VnAojuIrzFCKw8Jj",
+    "/api/assets/drive/1TrXrg0Iok7h2gD1ddxvc6r_LJ7wNBbfc?download=true&filename=cp3.webp",
+    "/api/assets/drive/1UBtWipAd_Yc5J8MSBegS0DZqfg9FK5mT?download=true&filename=cp4.webp",
+    "/api/assets/drive/1lOIK8-R4-ne4fLd90HURIhcn3Xr7zU59?download=true&filename=cp5.webp",
+    "/api/assets/drive/1SRsv1HsCeYGXvF4B8rDZxmmByeqYHkKb?download=true&filename=cp6.webp",
+    "/api/assets/drive/1ZJdAhCR4cosM4GoAEmoh1Rqn0s018lvV?download=true&filename=cp7.webp",
+    "/api/assets/drive/13fSTjlfMU1_YJg0fJ_5brwaArmpr0fFa?download=true&filename=cp8.webp",
+    "/api/assets/drive/12ZznzpSGzB0ylPuznl87dKLmjBbvv8oC?download=true&filename=cp9.webp"
   ],
+  "videos": [],
   "gameLink": "#",
   "platforms": [
     "Android"

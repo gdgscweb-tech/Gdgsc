@@ -1,159 +1,358 @@
-import React from "react";
+import React, { useMemo } from "react";
 import DetailCarousel from "./DetailCarousel";
-import { Download, ExternalLink, ArrowLeft, Monitor, Smartphone, Globe, Gamepad2 } from "lucide-react";
+import { resolveApiUrl } from "../services/api";
+import {
+  ArrowLeft,
+  Download,
+  ExternalLink,
+  Play,
+  Monitor,
+  Smartphone,
+  Globe,
+  Gamepad2,
+  Sparkles,
+  Users,
+  Calendar,
+  Layers,
+  FileCode,
+  ShieldCheck,
+} from "lucide-react";
 import "./GameDetailPage.css";
 
-// Helper to determine if a link is a downloadable file
-const isDownloadLink = (link) => {
-  if (!link) return false;
-  const downloadExtensions = ['.zip', '.rar', '.7z', '.exe', '.msi', '.dmg', '.apk', '.tar', '.gz'];
-  const lowerLink = link.toLowerCase();
-  return downloadExtensions.some(ext => lowerLink.includes(ext));
-};
-
-// Helper to determine if a link is a placeholder
-const isPlaceholderLink = (link) => {
-  return !link || link === '#' || link === '';
-};
-
-// Platform icon mapper
+// Platform icon helper
 const getPlatformIcon = (platform) => {
   switch (platform) {
-    case 'Windows':
-    case 'macOS':
-    case 'Linux':
-      return <Monitor size={16} />;
-    case 'Android':
-    case 'iOS':
-      return <Smartphone size={16} />;
-    case 'Web':
-      return <Globe size={16} />;
+    case "Windows":
+    case "macOS":
+    case "Linux":
+      return <Monitor size={14} />;
+    case "Android":
+    case "iOS":
+      return <Smartphone size={14} />;
+    case "Web":
+      return <Globe size={14} />;
     default:
-      return <Gamepad2 size={16} />;
+      return <Gamepad2 size={14} />;
   }
 };
 
-const GameDetailPage = ({ game, onBack, showBackButton }) => {
-  const handlePlayGame = () => {
-    if (isPlaceholderLink(game.gameLink)) {
-      return; // Do nothing for placeholder links
+const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
+  // Normalize screenshots
+  const screenshots = useMemo(() => {
+    if (!game) return [];
+    if (game.screenshots && game.screenshots.length > 0) {
+      return game.screenshots.map(resolveApiUrl);
     }
+    if (game.image) {
+      return [resolveApiUrl(game.image)];
+    }
+    return [];
+  }, [game]);
 
-    if (isDownloadLink(game.gameLink)) {
-      // Trigger download
-      const link = document.createElement('a');
-      link.href = game.gameLink;
-      link.download = game.gameFile || game.title;
+  const mediaItems = useMemo(
+    () => [
+      ...screenshots.map((url) => ({ url, isVideo: false })),
+      ...(Array.isArray(game.videos) ? game.videos : [])
+        .filter(Boolean)
+        .map((url) => ({ url: resolveApiUrl(url), isVideo: true })),
+    ],
+    [game.videos, screenshots],
+  );
+
+  // Compute related games (same genre or other titles excluding current)
+  const relatedGames = useMemo(() => {
+    if (!allGames || allGames.length <= 1) return [];
+    const sameGenre = allGames.filter(
+      (g) =>
+        (g._id || g.id) !== (game._id || game.id) &&
+        g.genre &&
+        game.genre &&
+        g.genre.toLowerCase() === game.genre.toLowerCase(),
+    );
+    if (sameGenre.length >= 3) return sameGenre.slice(0, 4);
+
+    const otherGames = allGames.filter(
+      (g) => (g._id || g.id) !== (game._id || game.id),
+    );
+    return otherGames.slice(0, 4);
+  }, [allGames, game]);
+
+  if (!game) return null;
+
+  const resolvedGameLink = resolveApiUrl(game.gameLink);
+  const isDownloadLink =
+    Boolean(resolvedGameLink) &&
+    (resolvedGameLink.startsWith("/api/games/assets") ||
+      resolvedGameLink.includes("/api/assets/") ||
+      resolvedGameLink.includes("drive.google.com/uc") ||
+      resolvedGameLink.includes("drive.google.com/file") ||
+      /\.(7z|apk|dmg|exe|rar|zip)(?:[?#]|$)/i.test(resolvedGameLink));
+
+  const isPlaceholderLink =
+    !game.gameLink || game.gameLink === "#" || game.gameLink === "";
+
+  const handleActionClick = () => {
+    if (isPlaceholderLink) return;
+
+    if (isDownloadLink) {
+      const link = document.createElement("a");
+      link.href = resolvedGameLink;
+      link.setAttribute("download", game.gameFile || `${game.title}.rar`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } else {
-      // Open external link in new tab
-      window.open(game.gameLink, "_blank");
+      window.open(game.gameLink, "_blank", "noopener,noreferrer");
     }
   };
-
-  // Determine button text and icon
-  const getButtonConfig = () => {
-    if (isPlaceholderLink(game.gameLink)) {
-      return { text: "COMING SOON", icon: null, disabled: true };
-    }
-    if (isDownloadLink(game.gameLink)) {
-      return {
-        text: `DOWNLOAD ${game.title.toUpperCase()}`,
-        icon: <Download size={24} className="play-icon" />,
-        disabled: false,
-      };
-    }
-    return {
-      text: `PLAY ${game.title.toUpperCase()}`,
-      icon: <ExternalLink size={24} className="play-icon" />,
-      disabled: false,
-    };
-  };
-
-  const buttonConfig = getButtonConfig();
-
-  // Separate screenshots into images and videos
-  const mediaItems = (game.screenshots || []).map(url => {
-    const lower = url.toLowerCase();
-    const isVideo = lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.mov') || lower.endsWith('.ogg');
-    return { url, isVideo };
-  });
 
   return (
-    <div className="detail-page-wrapper">
-      <div className="heading">
-        {showBackButton && (
-          <button
-            onClick={onBack}
-            className="back-button"
-            aria-label="Go back to game list"
-          >
-            <ArrowLeft size={20} />
-          </button>
-        )}
-        <h1 className="detail-page-title">{game.title}</h1>
+    <div className="store-detail-page-container">
+      {/* Top Breadcrumbs & Back Navigation */}
+      <div className="detail-top-nav">
+        <button onClick={onBack} className="detail-back-btn">
+          <ArrowLeft size={18} />
+          <span>Back to Store</span>
+        </button>
+
+        <div className="detail-breadcrumbs">
+          <span>Store</span>
+          <span className="crumb-sep">/</span>
+          <span>Games</span>
+          <span className="crumb-sep">/</span>
+          <span className="crumb-genre">{game.genre}</span>
+          <span className="crumb-sep">/</span>
+          <span className="crumb-active">{game.title}</span>
+        </div>
       </div>
 
-      {/* Carousel Section — supports both images and videos */}
-      <DetailCarousel screenshots={game.screenshots} gameTitle={game.title} mediaItems={mediaItems} />
-
-      {/* Content Box */}
-      <div className="detail-content-box">
-        {/* About Game Section */}
-        <div className="about-game-section">
-          <h2 className="content-heading content-heading-center">About Game</h2>
-          <p className="game-full-story">{game.fullStory}</p>
+      {/* Header Info Banner */}
+      <div className="detail-header-hero">
+        <div className="detail-header-meta">
+          <span className="detail-genre-pill">{game.genre}</span>
+          {game.isFeatured && (
+            <span className="detail-featured-badge">
+              <Sparkles size={12} /> Featured Guild Title
+            </span>
+          )}
+          {game.info?.year && (
+            <span className="detail-year-badge">{game.info.year}</span>
+          )}
         </div>
 
-        {/* Metadata Grid */}
-        <div className="metadata-grid">
-          <div className="metadata-item">
-            <h3 className="metadata-heading">Developer</h3>
-            <p className="metadata-text">{game.developer}</p>
-          </div>
+        <h1 className="detail-main-title">{game.title}</h1>
 
-          <div className="metadata-item">
-            <h3 className="metadata-heading">Release Year</h3>
-            <p className="metadata-text">{game.info?.year || "N/A"}</p>
-          </div>
-
-          <div className="metadata-item">
-            <h3 className="metadata-heading">Genre</h3>
-            <p className="metadata-text">{game.genre}</p>
-          </div>
+        <div className="detail-developer-row">
+          <span className="detail-dev-label">Developed by:</span>
+          <strong className="detail-dev-name">
+            {game.developer || "GDGSC Game Guild"}
+          </strong>
         </div>
+      </div>
 
-        {/* Platforms */}
-        {game.platforms && game.platforms.length > 0 && (
-          <div className="platforms-section">
-            <h3 className="metadata-heading" style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
-              Available On
-            </h3>
-            <div className="platforms-grid">
-              {game.platforms.map((platform) => (
-                <div key={platform} className="platform-chip">
-                  {getPlatformIcon(platform)}
-                  <span>{platform}</span>
-                </div>
-              ))}
+      {/* Two-Column Master Store Layout */}
+      <div className="detail-layout-grid">
+        {/* Left Master Column (Media & Narrative) */}
+        <div className="detail-main-column">
+          {/* Master Media Showcase */}
+          <DetailCarousel
+            screenshots={screenshots}
+            mediaItems={mediaItems}
+            gameTitle={game.title}
+          />
+
+          {/* About the Game Section */}
+          <div className="detail-narrative-box">
+            <div className="narrative-heading-row">
+              <Layers size={20} className="narrative-icon" />
+              <h2>About The Game</h2>
+            </div>
+
+            <div className="narrative-text-body">
+              {game.fullStory ? (
+                game.fullStory
+                  .split("\n")
+                  .filter((p) => p.trim().length > 0)
+                  .map((paragraph, idx) => <p key={idx}>{paragraph}</p>)
+              ) : (
+                <p>
+                  {game.description ||
+                    "Experience this student-developed masterpiece from the GDGSC Game Development Guild."}
+                </p>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Play / Download / Coming Soon Button */}
-        <div className="box-button">
-          <button
-            onClick={handlePlayGame}
-            className={`play-game-button ${buttonConfig.disabled ? 'play-game-button--disabled' : ''}`}
-            disabled={buttonConfig.disabled}
-          >
-            {buttonConfig.icon}
-            {buttonConfig.text}
-          </button>
+        {/* Right Sidebar Column (Sticky Action & Specifications) */}
+        <div className="detail-sidebar-column">
+          {/* Action Box Card */}
+          <div className="detail-action-card">
+            <div className="action-card-cover-wrapper">
+              <img
+                src={resolveApiUrl(game.image)}
+                alt={game.title}
+                className="action-card-cover-img"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://images.unsplash.com/photo-1542751371-adc38448a05e";
+                }}
+              />
+              <div className="action-card-cover-overlay">
+                <span className="action-status-chip">
+                  {isPlaceholderLink ? "COMING SOON" : "READY TO PLAY"}
+                </span>
+              </div>
+            </div>
+
+            {/* Primary Action Button */}
+            <div className="action-button-wrapper">
+              <button
+                className={`store-primary-action-btn ${
+                  isPlaceholderLink ? "is-disabled" : ""
+                }`}
+                onClick={handleActionClick}
+                disabled={isPlaceholderLink}
+              >
+                {isPlaceholderLink ? (
+                  <>
+                    <Sparkles size={18} />
+                    <span>COMING SOON</span>
+                  </>
+                ) : isDownloadLink ? (
+                  <>
+                    <Download size={18} />
+                    <span>DOWNLOAD GAME</span>
+                  </>
+                ) : (
+                  <>
+                    <Play size={18} />
+                    <span>PLAY NOW</span>
+                  </>
+                )}
+              </button>
+
+              {/* Download File Notice */}
+              {isDownloadLink && game.gameFile && (
+                <div className="download-file-note">
+                  <FileCode size={13} />
+                  <span>Package: {game.gameFile}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Supported Platforms */}
+            {game.platforms && game.platforms.length > 0 && (
+              <div className="sidebar-platforms-box">
+                <span className="sidebar-box-label">SUPPORTED PLATFORMS</span>
+                <div className="sidebar-platform-chips">
+                  {game.platforms.map((p) => (
+                    <span key={p} className="sidebar-platform-chip">
+                      {getPlatformIcon(p)}
+                      <span>{p}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Specifications Table Card */}
+          <div className="detail-specs-card">
+            <h3 className="specs-card-title">Game Specifications</h3>
+
+            <div className="specs-table">
+              <div className="spec-row">
+                <span className="spec-label">
+                  <Gamepad2 size={15} /> Developer
+                </span>
+                <strong className="spec-value">
+                  {game.developer || "GDGSC Guild"}
+                </strong>
+              </div>
+
+              <div className="spec-row">
+                <span className="spec-label">
+                  <Layers size={15} /> Genre
+                </span>
+                <strong className="spec-value">{game.genre}</strong>
+              </div>
+
+              {game.info?.year && (
+                <div className="spec-row">
+                  <span className="spec-label">
+                    <Calendar size={15} /> Release Year
+                  </span>
+                  <strong className="spec-value">{game.info.year}</strong>
+                </div>
+              )}
+
+              {game.info?.players && (
+                <div className="spec-row">
+                  <span className="spec-label">
+                    <Users size={15} /> Players
+                  </span>
+                  <strong className="spec-value">{game.info.players}</strong>
+                </div>
+              )}
+
+              <div className="spec-row">
+                <span className="spec-label">
+                  <ShieldCheck size={15} /> Verified Build
+                </span>
+                <strong className="spec-value spec-verified">
+                  GDGSC Certified
+                </strong>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Related Games Row */}
+      {relatedGames.length > 0 && (
+        <section className="detail-related-section">
+          <div className="related-section-header">
+            <Sparkles size={20} className="related-icon" />
+            <h2>More Games To Explore</h2>
+          </div>
+
+          <div className="related-games-grid">
+            {relatedGames.map((relGame) => (
+              <div
+                key={relGame._id || relGame.id}
+                className="related-game-card"
+                onClick={() => {
+                  if (onSelectGame) {
+                    onSelectGame(relGame);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              >
+                <div className="related-art-wrap">
+                  <img
+                    src={resolveApiUrl(relGame.image)}
+                    alt={relGame.title}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://images.unsplash.com/photo-1542751371-adc38448a05e";
+                    }}
+                  />
+                  <span className="related-genre-chip">{relGame.genre}</span>
+                </div>
+                <div className="related-card-info">
+                  <h4 className="related-title">{relGame.title}</h4>
+                  <span className="related-dev">
+                    {relGame.developer || "GDGSC Guild"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

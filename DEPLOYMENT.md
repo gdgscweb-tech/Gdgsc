@@ -5,10 +5,12 @@
 This application automatically detects whether it's running in development or production based on the hostname.
 
 ### Automatic Detection
+
 - **localhost** or **127.0.0.1** → Development mode (uses `http://localhost:5000`)
 - **Any other domain** → Production mode (uses `https://gdgsc-33246d1cdab1.herokuapp.com`)
 
 ### Manual Override
+
 You can explicitly set the environment using the `REACT_APP_ENV` variable.
 
 ## Frontend Deployment (Vercel)
@@ -33,6 +35,7 @@ Get_In_Touch_Form_Key=b49af77b-8712-41c6-b091-93909761f205
 The `.env.production` file is already configured and will be automatically used by Vercel during production builds.
 
 Just push your code:
+
 ```bash
 git add .
 git commit -m "Add production environment config"
@@ -72,6 +75,7 @@ PORT=5000
 ### Quick Start
 
 1. **Install dependencies:**
+
 ```bash
 # Backend
 cd backend
@@ -83,6 +87,7 @@ npm install
 ```
 
 2. **Start development servers:**
+
 ```bash
 # Backend (in backend directory)
 npm start
@@ -96,6 +101,7 @@ The app will automatically use development URLs (localhost).
 ### Switching Environments Manually
 
 Use the helper script:
+
 ```bash
 # Switch to development
 node switch-env.js development
@@ -109,12 +115,14 @@ node switch-env.js production
 ### Google OAuth
 
 Update your Google Cloud Console with these authorized redirect URIs:
+
 - Development: `http://localhost:5000/api/auth/google/callback`
 - Production: `https://gdgsc-33246d1cdab1.herokuapp.com/api/auth/google/callback`
 
 ### Discord OAuth
 
 Update your Discord Developer Portal with these redirect URIs:
+
 - Development: `http://localhost:5000/api/auth/discord/callback`
 - Production: `https://gdgsc-33246d1cdab1.herokuapp.com/api/auth/discord/callback`
 
@@ -123,6 +131,7 @@ Update your Discord Developer Portal with these redirect URIs:
 ### "Network Error" or "ERR_BLOCKED_BY_CLIENT"
 
 This means the frontend is trying to connect to localhost while deployed. Check:
+
 1. Environment variables are set correctly in Vercel
 2. `.env.production` file exists and is committed
 3. Clear browser cache and hard reload
@@ -130,6 +139,7 @@ This means the frontend is trying to connect to localhost while deployed. Check:
 ### CORS Errors
 
 Make sure:
+
 1. Backend `PROD_FRONTEND_URL` matches your Vercel domain
 2. Backend is deployed and running
 3. Both frontend and backend are using the same environment (both production or both development)
@@ -137,6 +147,7 @@ Make sure:
 ### OAuth Redirect Issues
 
 Verify:
+
 1. OAuth callback URLs in Google/Discord console match your backend URL
 2. Backend environment variables for callback URLs are correct
 3. Frontend is redirecting to the correct backend URL for OAuth

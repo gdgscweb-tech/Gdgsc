@@ -1,25 +1,31 @@
-import React from "react";
-import { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { ChevronLeft, ChevronRight, Play, Image as ImageIcon, Film } from "lucide-react";
 import "./DetailCarousel.css";
 
-const DetailCarousel = ({ screenshots, gameTitle, mediaItems }) => {
+const DetailCarousel = ({ screenshots = [], gameTitle = "Game", mediaItems = [] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlayingVideo, setIsPlayingVideo] = useState(true);
+  const videoRef = useRef(null);
 
-  // Use mediaItems if provided, otherwise build from screenshots
+  // Normalize media items: prioritize mediaItems, fallback to screenshots
   const items =
     mediaItems && mediaItems.length > 0
       ? mediaItems
-      : (screenshots || []).map((url) => ({ url, isVideo: false }));
+      : (screenshots || []).map((url) => {
+          const isVid =
+            typeof url === "string" &&
+            (url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".ogg"));
+          return { url, isVideo: isVid };
+        });
 
-  // Auto-advance (pause on videos)
+  // Auto-advance if not video
   useEffect(() => {
     if (items.length <= 1) return;
-    if (items[currentSlide]?.isVideo) return; // Don't auto-advance on videos
+    if (items[currentSlide]?.isVideo) return; // Never auto-advance when watching a video
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % items.length);
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [items.length, currentSlide, items]);
@@ -37,76 +43,108 @@ const DetailCarousel = ({ screenshots, gameTitle, mediaItems }) => {
   const current = items[currentSlide];
 
   return (
-    <section className="detail-carousel">
-      <div className="detail-carousel-image-container">
+    <div className="store-media-showcase">
+      {/* Primary Master Stage */}
+      <div className="media-master-stage">
         {current.isVideo ? (
-          <video
-            src={current.url}
-            className="detail-carousel-image"
-            key={currentSlide}
-            autoPlay
-            muted
-            loop
-            playsInline
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
-          />
+          <div className="master-video-wrapper">
+            <video
+              ref={videoRef}
+              src={current.url}
+              className="master-media-player"
+              key={`video-${currentSlide}`}
+              controls
+              autoPlay
+              muted
+              playsInline
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+          </div>
         ) : (
-          <img
-            src={current.url}
-            alt={`${gameTitle} screenshot ${currentSlide + 1}`}
-            className="detail-carousel-image"
-            key={currentSlide}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src =
-                "https://placehold.co/1200x600/374151/ffffff?text=SCREENSHOT+ERROR";
-            }}
-          />
+          <div className="master-image-wrapper">
+            <img
+              src={current.url}
+              alt={`${gameTitle} screenshot ${currentSlide + 1}`}
+              className="master-media-img"
+              key={`img-${currentSlide}`}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/1200x675/11121a/ffd700?text=SCREENSHOT+UNAVAILABLE";
+              }}
+            />
+          </div>
+        )}
+
+        {/* Navigation Arrows */}
+        {items.length > 1 && (
+          <>
+            <button
+              className="media-nav-arrow media-nav-arrow--left"
+              onClick={goToPrev}
+              aria-label="Previous media"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button
+              className="media-nav-arrow media-nav-arrow--right"
+              onClick={goToNext}
+              aria-label="Next media"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </>
+        )}
+
+        {/* Slide Counter Badge */}
+        {items.length > 1 && (
+          <div className="media-counter-badge">
+            {current.isVideo ? <Film size={12} /> : <ImageIcon size={12} />}
+            <span>
+              {currentSlide + 1} / {items.length}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Interactive Thumbnail Filmstrip */}
       {items.length > 1 && (
-        <>
-          <button
-            className="carousel-nav-btn carousel-nav-btn--left"
-            onClick={goToPrev}
-            aria-label="Previous screenshot"
-          >
-            <ChevronLeft size={28} />
-          </button>
-          <button
-            className="carousel-nav-btn carousel-nav-btn--right"
-            onClick={goToNext}
-            aria-label="Next screenshot"
-          >
-            <ChevronRight size={28} />
-          </button>
-        </>
-      )}
-
-      {/* Dots */}
-      <div className="detail-carousel-dots-container">
-        {items.length > 1 &&
-          items.map((_, index) => (
-            <button
-              key={index}
-              className={`detail-carousel-dot ${currentSlide === index ? "is-active" : ""}`}
-              onClick={() => setCurrentSlide(index)}
-              aria-label={`Go to screenshot ${index + 1}`}
-            ></button>
-          ))}
-      </div>
-
-      {/* Slide counter */}
-      {items.length > 1 && (
-        <div className="carousel-counter">
-          {currentSlide + 1} / {items.length}
+        <div className="media-thumbnail-filmstrip">
+          {items.map((item, index) => {
+            const isActive = currentSlide === index;
+            return (
+              <button
+                key={index}
+                className={`media-thumb-btn ${isActive ? "is-active" : ""}`}
+                onClick={() => setCurrentSlide(index)}
+                aria-label={`View media ${index + 1}`}
+              >
+                {item.isVideo ? (
+                  <div className="thumb-video-placeholder">
+                    <video src={item.url} muted preload="metadata" />
+                    <div className="thumb-video-icon-overlay">
+                      <Play size={14} fill="#ffd700" />
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={`Thumbnail ${index + 1}`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://placehold.co/200x120/11121a/ffffff?text=IMG";
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
