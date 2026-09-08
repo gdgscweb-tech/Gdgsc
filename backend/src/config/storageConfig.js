@@ -13,6 +13,7 @@ const parseEnvInt = (val, fallback) => {
 };
 
 const storageConfig = {
+  // Cloudflare R2 Credentials & Endpoints
   // Storage Provider ('google_drive' | 'r2')
   provider: process.env.STORAGE_PROVIDER || "google_drive",
 

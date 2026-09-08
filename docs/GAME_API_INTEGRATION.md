@@ -235,3 +235,4 @@ GOOGLE_DRIVE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY
 # Or OAuth2 Refresh Token:
 GOOGLE_DRIVE_REFRESH_TOKEN=your_oauth_refresh_token
 ```
+
