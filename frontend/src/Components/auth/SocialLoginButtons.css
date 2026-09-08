@@ -1,16 +1,16 @@
 /* frontend/src/components/Auth/SocialLoginButtons.css */
 
 .social-login-buttons {
-    margin-top: -30px;
+    margin-top: 16px;
     text-align: center;
 }
 
 .social-separator {
-    margin-bottom: 15px;
+    margin: 0 0 15px;
     color: #777;
     font-size: 0.9em;
     position: relative;
-    padding-bottom: 5px;
+    line-height: 1.4;
 }
 
 .social-btn {

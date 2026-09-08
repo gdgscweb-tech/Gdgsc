@@ -24,8 +24,9 @@ const SocialLoginButtons = () => {
 
     return (
         <div className="social-login-buttons">
-            <p className="social-separator" style={{padding:"0"}}>Or continue with:</p>
+            <p className="social-separator">Or continue with:</p>
             <button
+                type="button"
                 className="social-btn google-btn"
                 onClick={handleGoogleLogin}
             >
@@ -33,6 +34,7 @@ const SocialLoginButtons = () => {
                 Login with Google
             </button>
             <button
+                type="button"
                 className="social-btn discord-btn"
                 onClick={handleDiscordLogin}
             >

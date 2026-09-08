@@ -19,6 +19,11 @@
     box-sizing: border-box; /* Include padding in width */
 }
 
+.auth-form-card form {
+    position: relative;
+    z-index: 1;
+}
+
 .auth-form-card h2 {
     text-align: center;
     color: #fff;
@@ -97,17 +102,34 @@
 
 .auth-link-text {
     text-align: center;
-    margin-top: 25px;
+    margin: 20px 0 0;
     font-size: 0.95em;
     color: white;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
 }
 
 .auth-link-text a {
+    display: inline-block;
     color: #4CAF50;
     text-decoration: none;
     font-weight: bold;
+    padding: 2px 0;
 }
 
 .auth-link-text a:hover {
     text-decoration: underline;
+}
+
+/* Keep the account switcher and social actions in separate, clickable rows. */
+.auth-form-card .social-login-buttons {
+    margin-top: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-form-card .social-separator {
+    margin: 0 0 15px;
+    line-height: 1.4;
 }

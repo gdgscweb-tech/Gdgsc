@@ -9,7 +9,7 @@ const FormBg = ({ children }) => {
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         overflow: 'auto', // allow scroll only if needed
         background: `
           linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.7)),
@@ -18,7 +18,8 @@ const FormBg = ({ children }) => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
-        padding: '40px 10px', // responsive side padding
+        padding: '96px 10px 40px', // leave room for the fixed navbar
+        boxSizing: 'border-box',
       }}
     >
       <div
