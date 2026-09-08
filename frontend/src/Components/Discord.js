@@ -15,6 +15,8 @@ const Discord = () => {
             src="/images/chest.png"
             className="discordImage"
             alt="chest"
+            loading="lazy"
+            decoding="async"
           ></img>
         </div>
         <div className="discordtext">

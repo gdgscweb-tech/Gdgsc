@@ -1,4 +1,5 @@
 import React from "react";
+import { resolveApiUrl } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import Button from "../Button"; 
 import { motion } from "framer-motion";
@@ -76,9 +77,11 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
       <div className="event-image-container">
         {event.imageUrl ? (
           <motion.img 
-            src={event.imageUrl} 
+            src={resolveApiUrl(event.imageUrl)} 
             alt={event.name} 
-            className="event-image" 
+            className="event-image"
+            loading="lazy"
+            decoding="async" 
             layoutId={`image-${layoutId}`}
           />
         ) : (

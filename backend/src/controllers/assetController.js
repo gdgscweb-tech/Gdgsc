@@ -148,14 +148,83 @@ exports.getDownloadUrl = asyncHandler(async (req, res) => {
   return sendSuccess(res, result, 200);
 });
 
+// In-memory LRU cache for Google Drive media files
+const driveMediaCache = new Map();
+let currentCacheSizeBytes = 0;
+const MAX_CACHE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB max in-memory cache
+const MAX_FILE_CACHE_BYTES = 8 * 1024 * 1024;  // 8MB max per file
+
+const getCacheEntry = (fileId) => {
+  const entry = driveMediaCache.get(fileId);
+  if (!entry) return null;
+  driveMediaCache.delete(fileId);
+  driveMediaCache.set(fileId, entry);
+  return entry;
+};
+
+const setCacheEntry = (fileId, entry) => {
+  const size = entry.buffer.length;
+  if (size > MAX_FILE_CACHE_BYTES) return;
+
+  while (currentCacheSizeBytes + size > MAX_CACHE_SIZE_BYTES && driveMediaCache.size > 0) {
+    const oldestKey = driveMediaCache.keys().next().value;
+    const oldestEntry = driveMediaCache.get(oldestKey);
+    if (oldestEntry) {
+      currentCacheSizeBytes -= oldestEntry.buffer.length;
+      driveMediaCache.delete(oldestKey);
+    }
+  }
+
+  driveMediaCache.set(fileId, entry);
+  currentCacheSizeBytes += size;
+};
+
 /**
  * @desc    Stream a private Google Drive file through the configured storage API
  * @route   GET /api/assets/drive/:fileId
  * @access  Public app route; Drive credentials remain server-side
  */
 exports.proxyDriveFile = asyncHandler(async (req, res) => {
+  const fileId = req.params.fileId;
+  const isDownload = req.query.download === "true";
+  const etag = `W/"drive-${fileId}"`;
+
+  // Always set ETag for caching and revalidation
+  res.setHeader("ETag", etag);
+
+  if (isDownload) {
+    const requestedName = String(req.query.filename || `drive-${fileId}`)
+      .replace(/[\\"\r\n]/g, "")
+      .slice(0, 180);
+    res.setHeader("Content-Disposition", `attachment; filename="${requestedName}"`);
+    res.setHeader("Cache-Control", "private, max-age=3600");
+  } else {
+    // Aggressive public browser & CDN caching: 30 days max-age, 1 day stale-while-revalidate
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=2592000, stale-while-revalidate=86400, immutable",
+    );
+  }
+
+  // 304 Not Modified conditional check
+  const clientEtag = req.headers["if-none-match"];
+  if (clientEtag && (clientEtag === etag || clientEtag === `"${etag}"` || clientEtag.includes(`drive-${fileId}`))) {
+    return res.status(304).end();
+  }
+
+  // Check in-memory buffer cache for non-download, non-range requests
+  if (!req.headers.range && !isDownload) {
+    const cached = getCacheEntry(fileId);
+    if (cached) {
+      if (cached.contentType) res.setHeader("Content-Type", cached.contentType);
+      res.setHeader("Content-Length", cached.buffer.length);
+      res.setHeader("Accept-Ranges", "bytes");
+      return res.status(200).send(cached.buffer);
+    }
+  }
+
   const result = await assetService.getDriveFileStream({
-    fileId: req.params.fileId,
+    fileId,
     range: req.headers.range,
   });
 
@@ -164,23 +233,40 @@ exports.proxyDriveFile = asyncHandler(async (req, res) => {
     "content-length",
     "content-range",
     "content-type",
-    "etag",
     "last-modified",
   ];
   headersToForward.forEach((header) => {
     if (result.headers[header]) res.setHeader(header, result.headers[header]);
   });
 
-  if (req.query.download === "true") {
-    const requestedName = String(req.query.filename || `drive-${req.params.fileId}`)
-      .replace(/[\\"\r\n]/g, "")
-      .slice(0, 180);
-    res.setHeader("Content-Disposition", `attachment; filename=\"${requestedName}\"`);
-  } else if (req.query.cache === "team") {
-    res.setHeader(
-      "Cache-Control",
-      "public, max-age=86400, stale-while-revalidate=604800",
-    );
+  // Cache buffer in memory if size is within limits and not a range or download request
+  const contentLength = Number(result.headers["content-length"]) || 0;
+  if (!req.headers.range && !isDownload && (contentLength === 0 || contentLength <= MAX_FILE_CACHE_BYTES)) {
+    const chunks = [];
+    let totalBytes = 0;
+    let overflow = false;
+
+    result.data.on("data", (chunk) => {
+      if (!overflow) {
+        totalBytes += chunk.length;
+        if (totalBytes <= MAX_FILE_CACHE_BYTES) {
+          chunks.push(chunk);
+        } else {
+          overflow = true;
+          chunks.length = 0;
+        }
+      }
+    });
+
+    result.data.on("end", () => {
+      if (!overflow && chunks.length > 0) {
+        setCacheEntry(fileId, {
+          buffer: Buffer.concat(chunks),
+          contentType: result.headers["content-type"] || "image/jpeg",
+          etag,
+        });
+      }
+    });
   }
 
   res.status(result.status);

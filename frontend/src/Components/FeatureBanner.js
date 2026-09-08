@@ -1,6 +1,7 @@
 import React from "react";
 import "./FeatureBanner.css";
 import { Sparkles, Compass, Layers } from "lucide-react";
+import { resolveApiUrl } from "../services/api";
 
 const FeatureBanner = ({
   categories = [],
@@ -50,8 +51,10 @@ const FeatureBanner = ({
               onClick={() => handleCategoryClick(category.name)}
             >
               <img
-                src={category.image}
+                src={resolveApiUrl(category.image)}
                 alt={category.name}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "https://images.unsplash.com/photo-1550745165-9bc0b252726f";

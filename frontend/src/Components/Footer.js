@@ -15,7 +15,7 @@ const Footer = () => {
           <div className="royal-crest">
             <FaCrown className="crown-icon" style={{ zIndex: "10" }} />
             <div className="crest-circle" style={{ position: "relative" }}>
-              <img src="/assets/logos/logo1.jpg" alt="" width={"100%"} />
+              <img src="/assets/logos/logo1.jpg" alt="GDGSC Crest" width={"100%"} loading="lazy" decoding="async" />
             </div>
           </div>
           <div className="royal-info">

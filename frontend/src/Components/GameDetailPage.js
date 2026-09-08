@@ -193,6 +193,7 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
                 src={resolveApiUrl(game.image)}
                 alt={game.title}
                 className="action-card-cover-img"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src =
@@ -334,6 +335,8 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
                   <img
                     src={resolveApiUrl(relGame.image)}
                     alt={relGame.title}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src =

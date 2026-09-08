@@ -74,6 +74,8 @@ const Gamescard = ({
                     src={resolveApiUrl(game.image)}
                     alt={game.title}
                     className="card-artwork-img"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = "https://images.unsplash.com/photo-1542751371-adc38448a05e";

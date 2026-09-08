@@ -636,6 +636,8 @@ const MeetTeam = () => {
                         src={resolveTeamPhoto(member.photo)}
                         alt={member.name}
                         className="member-image"
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = resolveTeamPhoto(TEAM_FALLBACK);
@@ -645,6 +647,8 @@ const MeetTeam = () => {
                         src={resolveTeamPhoto(TEAM_FALLBACK)}
                         alt={member.name}
                         className="member-image"
+                        loading="lazy"
+                        decoding="async"
                       />
                       }
                     </div>

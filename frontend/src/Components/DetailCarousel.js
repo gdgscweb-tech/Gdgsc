@@ -69,6 +69,7 @@ const DetailCarousel = ({ screenshots = [], gameTitle = "Game", mediaItems = [] 
               alt={`${gameTitle} screenshot ${currentSlide + 1}`}
               className="master-media-img"
               key={`img-${currentSlide}`}
+              decoding="async"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src =
@@ -132,6 +133,8 @@ const DetailCarousel = ({ screenshots = [], gameTitle = "Game", mediaItems = [] 
                   <img
                     src={item.url}
                     alt={`Thumbnail ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src =

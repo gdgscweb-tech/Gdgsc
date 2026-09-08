@@ -96,6 +96,8 @@ export default function Gallery() {
               src={image.src} 
               alt={image.alt} 
               className="photo-img"
+              loading="lazy"
+              decoding="async"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'flex';

@@ -92,6 +92,7 @@ const Home = () => {
       >
         <img
           src="/images/home.webp"
+          decoding="async"
           height="100%"
           width={"100%"}
           style={{

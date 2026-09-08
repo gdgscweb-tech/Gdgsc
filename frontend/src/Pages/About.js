@@ -68,6 +68,8 @@ const About = () => {
             src="/assets/logos/About.jpeg"
             className="discordImage"
             alt="About"
+            loading="lazy"
+            decoding="async"
             style={{zIndex: 1}}
           ></img>
         </div>

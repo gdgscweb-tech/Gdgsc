@@ -40,6 +40,8 @@ const Faculty = () => {
           <img
             src="/images/mam/jyoti_mam1.jpg"
             alt="Dr. Jyoti"
+            loading="lazy"
+            decoding="async"
           />
         </Frame>
 
@@ -47,6 +49,8 @@ const Faculty = () => {
           <img
             src="/images/mam/renu_mam.jpg"
             alt="Dr. Renu"
+            loading="lazy"
+            decoding="async"
           />
         </Frame>
       </div>
