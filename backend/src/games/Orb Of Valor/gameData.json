@@ -1,14 +1,19 @@
 {
   "title": "Orb Of Valor",
-  "description": "Coming soon — an epic adventure awaits. Stay tuned for more details!",
-  "fullStory": "Orb Of Valor is an upcoming title from GDGSC. Details are being kept under wraps for now, but expect an action-packed adventure full of challenges and discovery. Watch this space!",
+  "description": "An epic adventure awaits — Play now!",
+  "fullStory": "Step into the boots of Moe, an archeologist on a solo expedition into centuries of forgotten ruins. But what begins as a routine dig unearths more than ancient stone — deep within, a sealed chamber hides a sleeping alien being and a strange, pulsating artifact that seems... alive, waiting to be held again.\n\nThe Creature wakes up from its slumber and you trigger the artifact in panic — only to be thrown across dimensions: from The land of towering dinosaurs, to the iron gates of a medieval palace, and into the shattered heart of a dystopian future. Each realm holds clues, dangers, and the lingering presence of the artifact — always disrupting life.",
   "genre": "Adventure",
   "developer": "GDGSC",
-  "image": "",
-  "screenshots": [],
+  "image": "/api/assets/drive/1Z3qCZGaEN-Vo_9VYASKsDqASx5Yq1Q6F",
+  "screenshots": [
+    "/api/assets/drive/1UVl-EDcavEtQf2iM0S_XHa7tW64U8CEO",
+    "/api/assets/drive/1bp7h4HHPi4giGtx4Wy_RcwCWQeApFeKc"
+  ],
   "videos": [],
-  "gameLink": "#",
-  "platforms": [],
+  "gameLink": "https://gdgsc.itch.io/orb-of-valor",
+  "platforms": [
+    "Windows"
+  ],
   "gameFolder": "Orb Of Valor",
   "gameFile": null,
   "info": {
@@ -16,5 +21,5 @@
     "year": "2025"
   },
   "isFeatured": false,
-  "isActive": false
+  "isActive": true
 }
