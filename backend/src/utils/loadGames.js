@@ -76,7 +76,8 @@ const syncGamesFromDisk = async () => {
 if (require.main === module) {
   (async () => {
     try {
-      await mongoose.connect(process.env.MONGO_URI);
+      const { getMongoUri } = require("../config/db");
+      await mongoose.connect(getMongoUri());
       console.log("✅ MongoDB connected");
       console.log(`\n📂 Scanning ${GAMES_DIR}\n`);
 
