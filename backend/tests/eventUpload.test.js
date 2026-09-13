@@ -1,0 +1,11 @@
+jest.mock('../src/config/storageConfig',()=>({getStorageRootConfig:()=>({folderId:'dev-root',environment:'development'})}));
+const mockEnsureFolder=jest.fn().mockResolvedValue({id:'events-folder'});
+const mockUploadFile=jest.fn().mockResolvedValue({fileId:'uploaded-banner'});
+jest.mock('../src/services/storage/GoogleDriveStorageService',()=>jest.fn().mockImplementation(()=>({ensureFolder:mockEnsureFolder,uploadFile:mockUploadFile})));
+const express=require('express'),request=require('supertest');
+const {upload}=require('../src/config/eventUpload');
+const app=express();app.post('/',upload.single('image'),(req,res)=>res.json({path:req.file?.path||null}));app.use((e,req,res,next)=>res.status(400).json({error:e.message}));
+afterEach(()=>jest.clearAllMocks());
+test('event banner uses environment Drive events folder',async()=>{const r=await request(app).post('/').attach('image',Buffer.from('fixture'),{filename:'banner.jpg',contentType:'image/jpeg'});expect(r.status).toBe(200);expect(r.body.path).toBe('/api/assets/drive/uploaded-banner');expect(mockEnsureFolder).toHaveBeenCalledWith('dev-root','events');expect(require('../src/services/storage/GoogleDriveStorageService')).toHaveBeenCalledWith({folderId:'events-folder',environment:'development'});});
+test('rejects non-image uploads',async()=>{const r=await request(app).post('/').attach('image',Buffer.from('fixture'),{filename:'x.txt',contentType:'text/plain'});expect(r.status).toBe(400);expect(mockUploadFile).not.toHaveBeenCalled();});
+test('quota failures explain the manual Drive path',async()=>{mockUploadFile.mockRejectedValueOnce(Error('quota'));const r=await request(app).post('/').attach('image',Buffer.from('fixture'),{filename:'banner.jpg',contentType:'image/jpeg'});expect(r.status).toBe(400);expect(r.body.error).toContain('manually');});

@@ -5,7 +5,7 @@ const router = express.Router();
 const eventController = require("../controllers/eventController");
 const { protect } = require("../middleware/authMiddleware");
 const admin = require("../middleware/adminMiddleware"); // Import admin middleware
-const { upload } = require("../config/cloudinary");
+const { upload } = require("../config/eventUpload");
 
 // Public routes for fetching events
 router.get("/", eventController.getEvents);

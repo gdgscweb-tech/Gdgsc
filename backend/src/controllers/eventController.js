@@ -137,35 +137,9 @@ exports.createEvent = asyncHandler(async (req, res) => {
 
   console.log("🟪 Parsed custom fields:", parsedCustomFields);
 
-  // --------- Image handling (CloudinaryStorage sets secure_url / url) ----------
-  let imageUrl = normalizeDriveImageUrl(directImageUrl);
-  let imageBackup = "";
-  let imageMetadata = {};
-
-  if (req.file) {
-    console.log("🟣 req.file object from multer/cloudinary:", req.file);
-
-    // Cloudinary storage commonly provides secure_url and/or url
-    const cloudUrl = req.file.secure_url || req.file.url || req.file.path || "";
-    if (cloudUrl) {
-      imageUrl = cloudUrl;
-      try {
-        imageBackup = await urlToBase64(cloudUrl);
-      } catch (err) {
-        console.warn("⚠️ Failed to create base64 backup from cloud URL:", err.message);
-        imageBackup = "";
-      }
-    }
-
-    imageMetadata = {
-      originalName: req.file.originalname || "",
-      mimeType: req.file.mimetype || "",
-      size: req.file.size || 0,
-      uploadedAt: new Date(),
-    };
-  } else {
-    console.log("ℹ️ No file uploaded with request (req.file is undefined).");
-  }
+  const imageUrl = req.file ? req.file.path : normalizeDriveImageUrl(directImageUrl);
+  const imageBackup = '';
+  const imageMetadata = {};
 
   // --------- Create event ----------
   const eventPayload = {
@@ -258,18 +232,6 @@ exports.updateEvent = asyncHandler(async (req, res) => {
         imageUrl = req.file.path;
     } else if (directImageUrl !== undefined) {
         imageUrl = normalizeDriveImageUrl(directImageUrl);
-    }
-
-    // If new image was uploaded, create backup
-    if (req.file) {
-        const imageBackup = await urlToBase64(req.file.path);
-        event.imageBackup = imageBackup;
-        event.imageMetadata = {
-            originalName: req.file.originalname,
-            mimeType: req.file.mimetype,
-            size: req.file.size,
-            uploadedAt: new Date(),
-        };
     }
 
     // Update event fields
