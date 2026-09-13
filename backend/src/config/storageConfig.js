@@ -12,6 +12,37 @@ const parseEnvInt = (val, fallback) => {
   return isNaN(parsed) ? fallback : parsed;
 };
 
+const { getEnvironment } = require("./db");
+
+const STORAGE_ROOT_VARIABLE_BY_ENVIRONMENT = Object.freeze({
+  development: "DEV_STORAGE_ROOT_FOLDER_ID",
+  production: "PROD_STORAGE_ROOT_FOLDER_ID",
+  test: "TEST_STORAGE_ROOT_FOLDER_ID",
+});
+
+const getStorageRootConfig = () => {
+  const environment = getEnvironment();
+  const variable = STORAGE_ROOT_VARIABLE_BY_ENVIRONMENT[environment];
+
+  if (!variable) {
+    throw new Error(
+      `Unsupported NODE_ENV "${environment}". Use development, production, or test.`,
+    );
+  }
+
+  const folderId = String(process.env[variable] || "").trim();
+  if (!folderId) {
+    throw new Error(
+      `${variable} is required for ${environment} Google Drive storage.`,
+    );
+  }
+
+  const otherRoots = Object.values(STORAGE_ROOT_VARIABLE_BY_ENVIRONMENT)
+    .filter(name => name !== variable).map(name => String(process.env[name] || '').trim()).filter(Boolean);
+  if (otherRoots.includes(folderId)) throw new Error('Drive environment roots must be distinct');
+  return { environment, variable, folderId };
+};
+
 const sanitizePrivateKey = (val) => {
   if (!val) return "";
   let key = String(val).trim();
@@ -31,7 +62,6 @@ const storageConfig = {
 
   // Google Drive Configuration
   googleDrive: {
-    folderId: process.env.GOOGLE_DRIVE_FOLDER_ID || "",
     teamFolderId: process.env.GOOGLE_DRIVE_TEAM_FOLDER_ID || "",
     clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL || "",
     privateKey: sanitizePrivateKey(process.env.GOOGLE_DRIVE_PRIVATE_KEY),
@@ -129,6 +159,19 @@ const storageConfig = {
     asset: [".json", ".txt", ".csv", ".pdf", ".bin", ".zip", ".cfg", ".ini"],
   },
 
+  // Drive may report generic binary MIME for archives/installers. Manual plans
+  // constrain more precisely by extension while retaining that documented fallback.
+  extensionMimeTypes: {
+    '.zip': ['application/zip', 'application/x-zip-compressed'],
+    '.rar': ['application/x-rar-compressed', 'application/vnd.rar', 'application/x-rar'],
+    '.7z': ['application/x-7z-compressed'], '.tar': ['application/x-tar'],
+    '.gz': ['application/gzip', 'application/x-gzip'], '.exe': ['application/x-msdownload', 'application/x-executable'],
+    '.apk': ['application/vnd.android.package-archive'],
+    '.png': ['image/png'], '.jpg': ['image/jpeg', 'image/jpg'], '.jpeg': ['image/jpeg', 'image/jpg'],
+    '.webp': ['image/webp'], '.gif': ['image/gif'], '.svg': ['image/svg+xml'],
+    '.mp4': ['video/mp4'], '.webm': ['video/webm'], '.mov': ['video/quicktime'], '.ogv': ['video/ogg'], '.mkv': ['video/x-matroska'],
+  },
+
   // Supported Asset Types and Categories
   types: ["file", "image", "video"],
   categories: [
@@ -170,3 +213,6 @@ const storageConfig = {
 };
 
 module.exports = storageConfig;
+module.exports.getStorageRootConfig = getStorageRootConfig;
+module.exports.STORAGE_ROOT_VARIABLE_BY_ENVIRONMENT =
+  STORAGE_ROOT_VARIABLE_BY_ENVIRONMENT;

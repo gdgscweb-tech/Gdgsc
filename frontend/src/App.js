@@ -12,8 +12,9 @@ import EventsPage from "./Pages/EventsPage";
 import AdminPage from "./Pages/AdminPage";
 import MeetTeam from "./Pages/MeetTeam";
 import Gallery from "./Pages/gallery";
-import StayTuned from "./Pages/StayTuned";
-import Gamepage from "./Pages/Gamepage";
+import StayTuned from './Pages/StayTuned';
+import RecruitPage from './Pages/RecruitPage';
+import Gamepage from './Pages/Gamepage';
 import { isGamesEnabled } from "./config/features";
 const App = () => {
   return (
@@ -48,6 +49,7 @@ const MainRoutes = () => {
         />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/stay-tuned" element={<StayTuned />} />
+        <Route path="/recruit" element={<RecruitPage />} />
       </Routes>
     </>
   );

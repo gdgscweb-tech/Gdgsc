@@ -121,6 +121,8 @@ GameAssetSchema.index({ game: 1, status: 1 });
 GameAssetSchema.index({ game: 1, category: 1, status: 1 });
 GameAssetSchema.index({ game: 1, version: 1 });
 
+GameAssetSchema.index({ 'metadata.driveFileId': 1 }, { unique: true, partialFilterExpression: { 'metadata.driveFileId': { $type: 'string' } }, name: 'unique_registered_drive_file' });
+
 const GameAsset =
   mongoose.models.GameAsset || mongoose.model("GameAsset", GameAssetSchema);
 

@@ -125,7 +125,7 @@ describe("AssetService Unit & Integration Tests", () => {
 
       expect(result.uploadUrl).toBe("https://r2.test/upload-presigned-url");
       expect(result.storageKey).toMatch(
-        /^games\/cyber-clash\/files\/v1\.0\.0\/[a-f0-9]{8}-game-build\.zip$/,
+        /^games\/66d000000000000000000010\/files\/v1\.0\.0\/[a-f0-9]{8}-game-build\.zip$/,
       );
       expect(result.asset.status).toBe("pending");
       expect(result.asset.visibility).toBe("private");
@@ -219,6 +219,7 @@ describe("AssetService Unit & Integration Tests", () => {
           originalFilename: "banner.webp",
           status: "ready",
           visibility: "public",
+          game: { isActive: true },
         }),
       };
 
@@ -257,7 +258,7 @@ describe("AssetService Unit & Integration Tests", () => {
           assetId: "66d000000000000000000041",
           user: mockUser, // not admin
         }),
-      ).rejects.toThrow(/not authorized to access this private asset/);
+      ).rejects.toThrow(/not publicly available/);
     });
 
     test("generates presigned download URL for authorized admin on private asset", async () => {
@@ -311,26 +312,26 @@ describe("AssetService Unit & Integration Tests", () => {
   });
 
   describe("deleteAsset", () => {
-    test("deletes object from storage and removes database record", async () => {
+    test("detaches asset and retains storage for recovery", async () => {
       const mockAsset = {
         _id: "66d000000000000000000050",
         storageKey: "games/cyber-clash/files/v1.0.0/old-build.zip",
         originalFilename: "old-build.zip",
-        deleteOne: jest.fn().mockResolvedValue(true),
+        save: jest.fn().mockResolvedValue(true),
       };
 
       jest.spyOn(GameAsset, "findById").mockResolvedValueOnce(mockAsset);
 
+      jest.spyOn(assetService, "removeGameReference").mockImplementationOnce(async asset => { asset.status = "deleted"; await asset.save(); });
       const result = await assetService.deleteAsset({
         assetId: "66d000000000000000000050",
         user: mockAdmin,
       });
 
-      expect(mockStorage.deleteObject).toHaveBeenCalledWith({
-        key: mockAsset.storageKey,
-      });
-      expect(mockAsset.deleteOne).toHaveBeenCalledTimes(1);
-      expect(result.message).toContain("deleted successfully");
+      expect(mockStorage.deleteObject).not.toHaveBeenCalled();
+      expect(mockAsset.status).toBe('deleted');
+      expect(mockAsset.save).toHaveBeenCalledTimes(1);
+      expect(result.message).toContain('storage retained');
     });
   });
 });

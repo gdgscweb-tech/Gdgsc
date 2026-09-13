@@ -10,6 +10,7 @@ const {
   CompleteMultipartUploadCommand,
   AbortMultipartUploadCommand,
 } = require("@aws-sdk/client-s3");
+const fs = require("fs");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const IStorageService = require("./IStorageService");
 const { getR2Client } = require("../../config/r2");
@@ -57,6 +58,18 @@ class R2StorageService extends IStorageService {
     const command = new PutObjectCommand(commandParams);
     const signedUrl = await getSignedUrl(this.client, command, { expiresIn });
     return signedUrl;
+  }
+
+  async uploadFile({ key, filePath, contentType, size }) {
+    if (!key || !filePath) throw new Error("Object key and file path are required");
+    await this.client.send(new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+      Body: fs.createReadStream(filePath),
+      ContentType: contentType || "application/octet-stream",
+      ...(size ? { ContentLength: size } : {}),
+    }));
+    return { key };
   }
 
   /**

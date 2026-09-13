@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Button from "../Button"; 
 import { motion } from "framer-motion";
 
+// Stable slug for the GDGSC Recruitments event.
+// When the REGISTER NOW button is clicked for this event, navigate to /recruit
+// instead of the generic event detail page. All other events are unaffected.
+const RECRUITMENT_SLUG = 'gdgsc-recruitments-2026';
+
 const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
   const navigate = useNavigate();
   const now = new Date();
@@ -46,7 +51,13 @@ const EventCard = ({ event, layoutId, onClick, isExpanded }) => {
   const handleRegistration = (e) => {
     e.stopPropagation(); // Prevent card click when clicking button
     if (!isButtonDisabled) {
-      navigate(`/events/${event.eventId}`); // Navigate to event details or registration page
+      if (event.slug === RECRUITMENT_SLUG) {
+        // Recruitment event — navigate to the dedicated application form
+        navigate('/recruit');
+      } else {
+        // All other events — generic event detail / registration page
+        navigate(`/events/${event.eventId}`);
+      }
     }
   };
 

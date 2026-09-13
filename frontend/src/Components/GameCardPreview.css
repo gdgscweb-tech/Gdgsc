@@ -1,0 +1,167 @@
+.preview-card {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.preview-card.is-preview {
+  opacity: 0.95;
+  border: 2px solid rgba(255, 206, 0, 0.5);
+  box-shadow: 0 0 20px rgba(255, 206, 0, 0.15);
+}
+
+.preview-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #ffce00, #ffd700);
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+}
+
+.card-artwork-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 20;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+}
+
+.card-artwork-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.preview-card:hover .card-artwork-img {
+  transform: scale(1.05);
+}
+
+.card-top-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+  z-index: 5;
+}
+
+.card-genre-badge {
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffce00;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 206, 0, 0.3);
+}
+
+.card-featured-star {
+  color: #ffce00;
+  filter: drop-shadow(0 0 6px rgba(255, 206, 0, 0.6));
+}
+
+.card-details-box {
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 0 0 12px 12px;
+}
+
+.card-title-row {
+  margin-bottom: 0.5rem;
+}
+
+.card-game-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.card-sub-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.card-dev-name {
+  color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-year-tag {
+  background: rgba(255, 206, 0, 0.15);
+  color: #ffce00;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.card-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-platforms-strip {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.card-platform-icon-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #aaa;
+  transition: all 0.2s ease;
+}
+
+.card-platform-icon-pill:hover {
+  background: rgba(255, 206, 0, 0.1);
+  border-color: rgba(255, 206, 0, 0.3);
+  color: #ffce00;
+}
+
+.card-action-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ffce00;
+  background: rgba(255, 206, 0, 0.1);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

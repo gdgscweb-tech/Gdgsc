@@ -3,9 +3,23 @@
 const asyncHandler = require("express-async-handler");
 const AssetService = require("../services/assetService");
 const GameAsset = require("../models/GameAsset");
+const fs = require("fs/promises");
 const { sendSuccess, sendError, ApiError } = require("../utils/apiResponse");
 
 const assetService = new AssetService();
+
+exports.prepareManualUpload = asyncHandler(async (req, res) => {
+  const { category, filename, version, replacesAssetId } = req.body;
+  return sendSuccess(res, await assetService.prepareManualUpload({ gameId: req.params.gameId,
+    category, filename, version, replacesAssetId, user: req.user }), 201);
+});
+exports.getManualUploadInstructions = asyncHandler(async (req, res) => {
+  return sendSuccess(res, await assetService.getManualUploadInstructions(req.params));
+});
+exports.registerManualUpload = asyncHandler(async (req, res) => {
+  return sendSuccess(res, await assetService.registerManualUpload({ ...req.params,
+    driveFileId: req.body.driveFileId, user: req.user }));
+});
 
 /**
  * @desc    Request presigned upload URL for single file upload
@@ -33,6 +47,41 @@ exports.createUploadUrl = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Upload a game asset through the backend to the configured storage provider.
+ * @route   POST /api/games/:gameId/assets/upload-file
+ * @access  Private/Admin
+ */
+exports.uploadFile = asyncHandler(async (req, res) => {
+  const { gameId } = req.params;
+  const { category, version, visibility, replacesAssetId } = req.body;
+  try {
+    const result = await assetService.uploadFile({
+      gameId,
+      file: req.file,
+      category,
+      version,
+      visibility,
+      user: req.user,
+      replacesAssetId,
+    });
+    return sendSuccess(res, result, 201);
+  } catch (err) {
+    // Log the full error detail so server logs show exactly what failed
+    console.error(
+      `[uploadFile] 400/500 on game=${gameId} category=${category}:`,
+      err.message,
+      err.code || "",
+    );
+    throw err; // Let asyncHandler + error middleware handle the response
+  } finally {
+    // Temp file is already deleted inside assetService.uploadFile's finally block.
+    // This is a safety net for the case where assetService threw before it reached its own finally.
+    if (req.file?.path) await fs.unlink(req.file.path).catch(() => {});
+  }
+});
+
+
+/**
  * @desc    Notify backend that direct R2 upload completed
  * @route   POST /api/assets/:assetId/complete
  * @access  Private/Admin
@@ -43,6 +92,7 @@ exports.completeUpload = asyncHandler(async (req, res) => {
   const result = await assetService.completeUpload({
     assetId,
     user: req.user,
+    // Drive IDs are supplied only by backend uploads.
   });
 
   return sendSuccess(res, result, 200);
@@ -145,7 +195,8 @@ exports.getDownloadUrl = asyncHandler(async (req, res) => {
     download,
   });
 
-  return sendSuccess(res, result, 200);
+  const { asset, ...publicResult } = result;
+  return sendSuccess(res, publicResult, 200);
 });
 
 // In-memory LRU cache for Google Drive media files
@@ -186,6 +237,30 @@ const setCacheEntry = (fileId, entry) => {
  */
 exports.proxyDriveFile = asyncHandler(async (req, res) => {
   const fileId = req.params.fileId;
+  const Game = require('../models/Game');
+  const gameService = require('../services/gameService');
+  const linkedAsset = await GameAsset.findOne({ 'metadata.driveFileId': fileId });
+  const prefix = `/api/assets/drive/${fileId}`;
+  const escaped = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const reference = { $regex: `^${escaped}(?:\\?|$)` };
+  const games = await Game.find({ $or: ['image','banner','screenshots','videos','gameLink'].map(field => ({ [field]: reference })) });
+  if (linkedAsset || games.length) {
+    if (linkedAsset) {
+      await assetService.getDownloadUrl({ assetId: String(linkedAsset._id), user: req.user });
+    } else if (req.user?.role !== 'admin' && !games.some(game => gameService.isLive(game))) {
+      throw new ApiError(404, 'ASSET_NOT_FOUND', 'Game file is not public');
+    }
+    await assetService.storage.assertInRoot(fileId);
+    const stream = await assetService.getDriveFileStream({ fileId, range: req.headers.range });
+    res.set('Cache-Control', 'private, no-store');
+    for (const header of ['content-type','content-length','content-range','accept-ranges']) if (stream.headers[header]) res.set(header, stream.headers[header]);
+    if (req.query.download === 'true') res.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(String(req.query.filename || fileId))}`);
+    stream.data.on('error', () => res.destroy());
+    res.status(stream.status); stream.data.pipe(res); return;
+  }
+  // Preserve only the existing explicit team image allowlist; arbitrary Drive IDs are denied.
+  const manifest = require('fs').readFileSync(require('path').resolve(__dirname, '../../../frontend/src/data/teamAssetManifest.js'), 'utf8');
+  if (!manifest.includes(`/api/assets/drive/${fileId}?cache=team`)) throw new ApiError(404, 'ASSET_NOT_FOUND', 'File is not an application asset');
   const isDownload = req.query.download === "true";
   const etag = `W/"drive-${fileId}"`;
 
@@ -281,6 +356,7 @@ exports.proxyDriveFile = asyncHandler(async (req, res) => {
 exports.getAssetById = asyncHandler(async (req, res) => {
   const { assetId } = req.params;
 
+  await assetService.getDownloadUrl({ assetId, user: req.user });
   const asset = await GameAsset.findById(assetId).populate(
     "game",
     "title name slug",
@@ -323,6 +399,32 @@ exports.getGameAssets = asyncHandler(async (req, res) => {
   });
 
   return sendSuccess(res, result, 200);
+});
+
+/**
+ * Redirects public/private asset requests to the provider URL while keeping
+ * provider credentials and storage details on the backend.
+ * @route   GET /api/assets/:assetId/content
+ */
+exports.getAssetContent = asyncHandler(async (req, res) => {
+  let user = req.user;
+  if (!user && req.query.ticket) {
+    try {
+      const ticket = require('jsonwebtoken').verify(req.query.ticket, process.env.JWT_SECRET);
+      if (ticket.purpose === 'asset-preview' && ticket.assetId === req.params.assetId) user = { role: 'admin' };
+    } catch {}
+  }
+  const result = await assetService.getDownloadUrl({ assetId: req.params.assetId, user,
+    download: req.query.download === 'true' });
+  res.set('Cache-Control', 'private, no-store');
+  if (!result.asset) return res.redirect(result.url);
+  const stream = await assetService.getDriveFileStream({ fileId: result.asset.metadata.driveFileId, range: req.headers.range });
+  for (const header of ['content-type','content-length','content-range','accept-ranges']) {
+    if (stream.headers[header]) res.set(header, stream.headers[header]);
+  }
+  if (req.query.download === 'true') res.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(result.filename)}`);
+  stream.data.on('error', () => res.destroy());
+  res.status(stream.status); stream.data.pipe(res);
 });
 
 /**

@@ -5,6 +5,9 @@ import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./AdminPage.css";
+import EventAdminPanel from "./admin/EventAdminPanel";
+import GameAdminPanel from "./admin/GameAdminPanel";
+import RecruitmentAdminPanel from "./admin/RecruitmentAdminPanel";
 const AdminPage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -35,7 +38,7 @@ const AdminPage = () => {
   const [editEventForm, setEditEventForm] = useState({});
   const [editCustomFields, setEditCustomFields] = useState([]);
   const [editSelectedImage, setEditSelectedImage] = useState(null);
-  const [editImagePreview, setEditImagePreview] = useState("");
+  const [, setEditImagePreview] = useState("");
   const [message, setMessage] = useState("");
 
   // Users state
@@ -196,18 +199,6 @@ const AdminPage = () => {
     setEditSelectedImage(null);
   };
 
-  const handleEditImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setEditSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleEditEventSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -359,6 +350,8 @@ const AdminPage = () => {
     </div>
   );
 
+  // Legacy event markup is kept temporarily for the dashboard source while EventAdminPanel owns the active tab.
+  // eslint-disable-next-line no-unused-vars
   const renderEvents = () => (
     <div>
       <div className="bento-grid">
@@ -664,6 +657,8 @@ const AdminPage = () => {
     </div>
   );
 
+  void renderEvents;
+
   const renderUsers = () => {
     const filteredUsers = users.filter(u =>
       u.username?.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -862,6 +857,18 @@ const AdminPage = () => {
             📋 Events
           </button>
           <button
+            className={`admin-tab ${activeTab === "games" ? "active" : ""}`}
+            onClick={() => setActiveTab("games")}
+          >
+            🎮 Games
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "recruitments" ? "active" : ""}`}
+            onClick={() => setActiveTab("recruitments")}
+          >
+            🎯 Recruitments
+          </button>
+          <button
             className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
             onClick={() => setActiveTab("users")}
           >
@@ -876,7 +883,9 @@ const AdminPage = () => {
         </div>
 
         {activeTab === "dashboard" && renderDashboard()}
-        {activeTab === "events" && renderEvents()}
+        {activeTab === "events" && <EventAdminPanel />}
+        {activeTab === "games" && <GameAdminPanel />}
+        {activeTab === "recruitments" && <RecruitmentAdminPanel />}
         {activeTab === "users" && renderUsers()}
         {activeTab === "exp" && renderEXP()}
       </div>

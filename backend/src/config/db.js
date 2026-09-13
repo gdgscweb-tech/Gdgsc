@@ -2,82 +2,101 @@
 
 const mongoose = require("mongoose");
 
-/**
- * Resolves the environment-specific MongoDB connection URI.
- *
- * Rules:
- * - Production (NODE_ENV === 'production'):
- *     Strictly requires PROD_MONGO_URI or MONGODB_URI_PROD (or host-injected MONGO_URI/MONGODB_URI).
- *     Throws a clear fatal error if missing; never falls back to development/local databases.
- * - Development (NODE_ENV === 'development'):
- *     Uses DEV_MONGO_URI or MONGODB_URI_DEV.
- *     Falls back to local development database (mongodb://127.0.0.1:27017/gdgsc_dev) if unset.
- *     Strictly NEVER inspects or connects to PROD_MONGO_URI.
- * - Test (NODE_ENV === 'test'):
- *     Uses TEST_MONGO_URI or defaults to mongodb://127.0.0.1:27017/gdgsc_test.
- */
-const getMongoUri = () => {
-  const env = (process.env.NODE_ENV || "development").trim().toLowerCase();
+const DATABASE_BY_ENVIRONMENT = Object.freeze({
+  development: "dev",
+  production: "test",
+  test: "gdgsc_test",
+});
 
-  if (env === "production") {
-    const prodUri =
-      process.env.PROD_MONGO_URI ||
-      process.env.MONGODB_URI_PROD ||
-      process.env.MONGO_URI ||
-      process.env.MONGODB_URI;
+const getEnvironment = () =>
+  (process.env.NODE_ENV || "development").trim().toLowerCase();
 
-    if (!prodUri) {
-      throw new Error(
-        "FATAL: Production MongoDB URI is not configured. Please set PROD_MONGO_URI (or MONGO_URI) in your production environment variables.",
-      );
-    }
-    return prodUri;
+const withDatabaseName = (uri, databaseName) => {
+  const value = String(uri).trim();
+  const queryStart = value.search(/[?#]/);
+  const head = queryStart === -1 ? value : value.slice(0, queryStart);
+  const suffix = queryStart === -1 ? "" : value.slice(queryStart);
+  const schemeEnd = head.indexOf("://");
+
+  if (schemeEnd === -1) {
+    throw new Error("MongoDB URI must include a valid scheme");
   }
 
-  if (env === "test") {
-    return (
-      process.env.TEST_MONGO_URI ||
-      process.env.MONGODB_URI_TEST ||
-      "mongodb://127.0.0.1:27017/gdgsc_test"
+  const pathStart = head.indexOf("/", schemeEnd + 3);
+  const authority = pathStart === -1 ? head : head.slice(0, pathStart);
+  return `${authority}/${databaseName}${suffix}`;
+};
+
+/**
+ * Resolve the complete MongoDB connection configuration in one place.
+ *
+ * Both production and development use the confirmed GDGSC cluster URI from
+ * PROD_MONGO_URI. NODE_ENV selects the database explicitly; the database path
+ * supplied by the URI is always replaced, so gdgsc_prod or MongoDB defaults
+ * can never be selected accidentally.
+ */
+const getMongoConfig = () => {
+  const environment = getEnvironment();
+  const databaseName = DATABASE_BY_ENVIRONMENT[environment];
+
+  if (!databaseName) {
+    throw new Error(
+      `Unsupported NODE_ENV "${environment}". Use development, production, or test.`,
     );
   }
 
-  // Development environment: Strictly use dev config; never touch production
-  const devUri =
-    process.env.DEV_MONGO_URI ||
-    process.env.MONGODB_URI_DEV ||
-    process.env.MONGO_URI;
+  if (environment === "test") {
+    const testUri =
+      process.env.TEST_MONGO_URI || "mongodb://127.0.0.1:27017/gdgsc_test";
 
-  if (devUri) {
-    return devUri;
+    return {
+      environment,
+      databaseName,
+      uri: withDatabaseName(testUri, databaseName),
+      sourceVariable: process.env.TEST_MONGO_URI
+        ? "TEST_MONGO_URI"
+        : "local fallback",
+    };
   }
 
-  // Default local fallback for developer workstation convenience
-  return "mongodb://127.0.0.1:27017/gdgsc_dev";
+  const clusterUri = process.env.PROD_MONGO_URI;
+  if (!clusterUri) {
+    throw new Error(
+      `FATAL: PROD_MONGO_URI is required for ${environment} and must point to the GDGSC Atlas cluster.`,
+    );
+  }
+
+  return {
+    environment,
+    databaseName,
+    uri: withDatabaseName(clusterUri, databaseName),
+    sourceVariable: "PROD_MONGO_URI",
+  };
 };
+
+const getMongoUri = () => getMongoConfig().uri;
 
 const connectDB = async () => {
   try {
-    const mongoUri = getMongoUri();
-    const env = (process.env.NODE_ENV || "development").trim().toLowerCase();
-
-    // Mask credentials in console output for security
-    const maskedUri = mongoUri.replace(/:([^:@]+)@/, ":****@");
-    console.log(`Connecting to MongoDB [${env.toUpperCase()}]: ${maskedUri}`);
-
-    const conn = await mongoose.connect(mongoUri);
+    const config = getMongoConfig();
     console.log(
-      `MongoDB Connected: ${conn.connection.host} (Database: ${conn.connection.name || "default"})`,
+      `Connecting to MongoDB [${config.environment.toUpperCase()}] database=${config.databaseName}`,
+    );
+
+    const conn = await mongoose.connect(config.uri);
+    console.log(
+      `MongoDB Connected: ${conn.connection.host} (Database: ${conn.connection.name})`,
     );
     return conn;
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    // Do not call process.exit(1) in production so the server stays up to handle CORS, health checks, and reconnection
-    if (process.env.NODE_ENV === "test") {
+    if (getEnvironment() === "test") {
       throw error;
     }
   }
 };
 
 module.exports = connectDB;
+module.exports.getEnvironment = getEnvironment;
+module.exports.getMongoConfig = getMongoConfig;
 module.exports.getMongoUri = getMongoUri;

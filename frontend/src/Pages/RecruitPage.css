@@ -1,0 +1,446 @@
+/* frontend/src/Pages/RecruitPage.css */
+
+.recruit-page {
+  min-height: 100vh;
+  background: #0f0f0f;
+  color: #fff;
+  padding: 2rem 1rem 4rem;
+}
+
+.recruit-hero {
+  text-align: center;
+  padding: 3rem 1rem 2.5rem;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.recruit-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffce00, #ff9800);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+}
+
+.recruit-hero p {
+  color: #aaa;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* ---- Login prompt ---- */
+.recruit-login-prompt {
+  max-width: 480px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 2.5rem;
+  background: rgba(255, 206, 0, 0.05);
+  border: 1px solid rgba(255, 206, 0, 0.2);
+  border-radius: 16px;
+}
+
+.recruit-login-prompt h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.recruit-login-prompt p {
+  color: #aaa;
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Form container ---- */
+.recruit-form-container {
+  max-width: 780px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem;
+}
+
+.recruit-form-container h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.75rem;
+  color: #ffce00;
+}
+
+/* ---- Grid layout for form fields ---- */
+.recruit-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .recruit-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recruit-form-full {
+  grid-column: 1 / -1;
+}
+
+/* ---- Field styles ---- */
+.recruit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.recruit-field label {
+  font-size: 0.85rem;
+  color: #ccc;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.recruit-field label .required-star {
+  color: #ff5555;
+  margin-left: 2px;
+}
+
+.recruit-field input,
+.recruit-field select,
+.recruit-field textarea {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.65rem 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.recruit-field input:focus,
+.recruit-field select:focus,
+.recruit-field textarea:focus {
+  border-color: #ffce00;
+  background: rgba(255, 206, 0, 0.04);
+}
+
+.recruit-field select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.recruit-field textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.recruit-field .field-hint {
+  font-size: 0.78rem;
+  color: #777;
+}
+
+/* ---- Section divider ---- */
+.recruit-section-title {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffce00;
+  border-bottom: 1px solid rgba(255, 206, 0, 0.2);
+  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- Submit area ---- */
+.recruit-submit-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* ---- Status badge ---- */
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.pending   { background: rgba(255, 206, 0, 0.15); color: #ffce00; border: 1px solid rgba(255, 206, 0, 0.3); }
+.status-badge.shortlisted { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+.status-badge.rejected  { background: rgba(255, 85, 85, 0.15); color: #ff5555; border: 1px solid rgba(255, 85, 85, 0.3); }
+.status-badge.selected  { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+
+/* ---- Existing application view ---- */
+.recruit-view-card {
+  max-width: 780px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem;
+}
+
+.recruit-view-card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recruit-view-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.recruit-view-table td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.93rem;
+  vertical-align: top;
+}
+
+.recruit-view-table td:first-child {
+  color: #888;
+  width: 40%;
+  font-weight: 500;
+}
+
+/* ---- Buttons (reuse admin/events style) ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+.btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.btn-primary   { background: #ffce00; color: #000; }
+.btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+.btn-danger    { background: rgba(255, 85, 85, 0.15); color: #ff5555; border: 1px solid rgba(255,85,85,0.3); }
+
+/* ---- Alert messages ---- */
+.recruit-alert {
+  padding: 0.9rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.recruit-alert.success {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+}
+
+.recruit-alert.error {
+  background: rgba(255, 85, 85, 0.1);
+  border: 1px solid rgba(255, 85, 85, 0.3);
+  color: #ff7b7b;
+}
+
+/* ---- Loading ---- */
+.recruit-loading {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #888;
+  font-size: 1rem;
+}
+
+/* =========================================================
+   Custom Multi-Select (team picker)
+   ========================================================= */
+
+.multi-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Trigger button — mimics the look of a <select> */
+.multi-select-trigger {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.65rem 2.25rem 0.65rem 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.multi-select-trigger:focus-visible {
+  outline: 2px solid #ffce00;
+  outline-offset: 2px;
+}
+
+.multi-select-trigger.open,
+.multi-select-trigger:hover {
+  border-color: #ffce00;
+  background: rgba(255, 206, 0, 0.04);
+}
+
+.multi-select-trigger.has-error {
+  border-color: #ff5555;
+}
+
+/* Caret icon */
+.multi-select-trigger::after {
+  content: '▾';
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 0.8rem;
+  pointer-events: none;
+  transition: transform 0.15s ease;
+}
+
+.multi-select-trigger.open::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Dropdown panel */
+.multi-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 206, 0, 0.3);
+  border-radius: 10px;
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.multi-select-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+.multi-select-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 206, 0, 0.3);
+  border-radius: 4px;
+}
+
+/* Individual option row */
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-size: 0.92rem;
+  color: #ddd;
+  user-select: none;
+}
+
+.multi-select-option:hover {
+  background: rgba(255, 206, 0, 0.08);
+  color: #fff;
+}
+
+.multi-select-option.selected {
+  color: #ffce00;
+}
+
+/* Custom checkbox */
+.multi-select-option input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.multi-select-option input[type='checkbox']:checked {
+  background: #ffce00;
+  border-color: #ffce00;
+}
+
+.multi-select-option input[type='checkbox']:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Selected chips container */
+.multi-select-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.multi-select-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 206, 0, 0.12);
+  border: 1px solid rgba(255, 206, 0, 0.35);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  color: #ffce00;
+  font-weight: 500;
+}
+
+.multi-select-chip-remove {
+  background: none;
+  border: none;
+  color: #ffce00;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+
+.multi-select-chip-remove:hover {
+  opacity: 1;
+}
+
+.multi-select-placeholder {
+  color: #666;
+}
+

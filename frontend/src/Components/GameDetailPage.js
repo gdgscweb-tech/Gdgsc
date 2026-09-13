@@ -40,8 +40,9 @@ const GameDetailPage = ({ game, onBack, allGames = [], onSelectGame }) => {
   // Normalize screenshots
   const screenshots = useMemo(() => {
     if (!game) return [];
-    if (game.screenshots && game.screenshots.length > 0) {
-      return game.screenshots.map(resolveApiUrl);
+    const gallery = [game.banner, ...(game.screenshots || [])].filter(Boolean);
+    if (gallery.length > 0) {
+      return gallery.map(resolveApiUrl);
     }
     if (game.image) {
       return [resolveApiUrl(game.image)];

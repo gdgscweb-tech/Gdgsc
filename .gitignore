@@ -8,6 +8,11 @@ backend/.env
 backend/google-drive-service-account.json
 frontend/.env
 
+# Local MongoDB dump/backup artifacts
+/.mongo-dumps/
+/mongo-dumps/
+*.archive.gz
+
 # But allow environment templates
 !**/.env.example
 !**/.env.production

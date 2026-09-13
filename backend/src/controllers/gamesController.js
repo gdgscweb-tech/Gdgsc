@@ -40,6 +40,33 @@ exports.getGames = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Get all games for the admin console, including unpublished games
+ * @route   GET /api/games/admin
+ * @access  Private/Admin
+ */
+exports.getAdminGames = asyncHandler(async (req, res) => {
+    const { genre, search, isFeatured, isActive, page, limit } = req.query;
+    // null → no isActive filter (show all games including unpublished/disabled)
+    const resolvedIsActive = isActive === undefined || isActive === 'all'
+        ? null
+        : isActive === 'true';
+    const result = await gameService.getGames({
+        genre,
+        search,
+        isFeatured: isFeatured !== undefined ? isFeatured === 'true' : undefined,
+        isActive: resolvedIsActive,
+        page,
+        limit,
+    });
+
+    return sendSuccess(res, result.games, 200, {
+        total: result.total,
+        page: result.page,
+        pages: result.pages,
+    });
+});
+
+/**
  * @desc    Get a single game by ID or slug
  * @route   GET /api/games/:id
  * @access  Public
@@ -47,7 +74,7 @@ exports.getGames = asyncHandler(async (req, res) => {
 exports.getGameById = asyncHandler(async (req, res) => {
     const game = await gameService.findGameByIdOrSlug(req.params.id);
 
-    if (!game) {
+    if (!game || !gameService.isLive(game)) {
         throw new ApiError(404, 'GAME_NOT_FOUND', `Game with ID or slug '${req.params.id}' not found`);
     }
 
@@ -74,7 +101,7 @@ exports.getGameById = asyncHandler(async (req, res) => {
  * @access  Public
  */
 exports.getFeaturedGames = asyncHandler(async (req, res) => {
-    const games = await Game.find({ isFeatured: true, isActive: true })
+    const games = await Game.find({ isFeatured: true, isActive: true, isDisabled: { $ne: true } })
         .sort({ createdAt: -1 })
         .limit(5);
 
@@ -122,7 +149,8 @@ exports.updateGame = asyncHandler(async (req, res) => {
  * @access  Private/Admin
  */
 exports.deleteGame = asyncHandler(async (req, res) => {
-    const result = await gameService.deleteGame(req.params.id);
+    const { getDefaultStorageService } = require('../services/storage/storageFactory');
+    const result = await gameService.deleteGame(req.params.id, getDefaultStorageService());
 
     if (req.query.envelope === 'true') {
         return sendSuccess(res, result, 200);
@@ -131,6 +159,83 @@ exports.deleteGame = asyncHandler(async (req, res) => {
     return res.status(200).json(result);
 });
 
+
+/**
+ * @desc    Reorder screenshot or trailer assets for a game
+ * @route   PATCH /api/games/:id/assets/reorder
+ * @access  Private/Admin
+ * @body    { category: 'screenshot'|'trailer', order: [assetId, ...] }
+ */
+exports.reorderGameAssets = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { category, order } = req.body;
+
+    if (!['screenshot', 'trailer'].includes(category)) {
+        throw new ApiError(400, 'VALIDATION_ERROR', "category must be 'screenshot' or 'trailer'");
+    }
+    if (!Array.isArray(order)) {
+        throw new ApiError(400, 'VALIDATION_ERROR', 'order must be an array of asset IDs');
+    }
+
+    let resolvedUrls;
+    await gameService.mutate(id, async game => {
+        if (new Set(order).size !== order.length) throw new ApiError(400, 'VALIDATION_ERROR', 'Duplicate assets in order');
+        const field = category === 'screenshot' ? 'screenshots' : 'videos';
+        resolvedUrls = [];
+        for (const assetId of order) {
+            const asset = await GameAsset.findById(assetId);
+            if (!asset || String(asset.game) !== String(game._id) || asset.category !== category || asset.status !== 'ready') {
+                throw new ApiError(400, 'VALIDATION_ERROR', 'Every ordered asset must be ready and belong to this game and category');
+            }
+            resolvedUrls.push(`/api/assets/${asset._id}/content`);
+        }
+        const current = game[field] || [];
+        const managed = current.filter(url => /^\/api\/assets\/[a-f0-9]{24}\/content$/.test(url));
+        if (managed.length !== resolvedUrls.length || managed.some(url => !resolvedUrls.includes(url))) {
+            throw new ApiError(400, 'VALIDATION_ERROR', 'Order must contain every current managed asset exactly once');
+        }
+        // Keep legacy URL positions; reorder only managed entries.
+        let index = 0;
+        game[field] = current.map(url => managed.includes(url) ? resolvedUrls[index++] : url);
+    });
+
+    if (req.query.envelope === 'true') {
+        return sendSuccess(res, { category, order: resolvedUrls }, 200);
+    }
+    return res.status(200).json({ category, order: resolvedUrls });
+});
+
+
+exports.getAdminGame = asyncHandler(async (req, res) => {
+    const game = await gameService.findGameByIdOrSlug(req.params.id);
+    if (!game) throw new ApiError(404, 'GAME_NOT_FOUND', 'Game not found');
+    return sendSuccess(res, game);
+});
+exports.getPublicationValidation = asyncHandler(async (req, res) => {
+    const game = await gameService.findGameByIdOrSlug(req.params.id);
+    if (!game) throw new ApiError(404, 'GAME_NOT_FOUND', 'Game not found');
+    return sendSuccess(res, await gameService.validatePublication(game));
+});
+exports.setPublication = asyncHandler(async (req, res) => {
+    return sendSuccess(res, await gameService.setPublication(req.params.id, req.body.action));
+});
+exports.downloadGameData = asyncHandler(async (req, res) => {
+    const game = await gameService.findGameByIdOrSlug(req.params.id);
+    if (!game) throw new ApiError(404, 'GAME_NOT_FOUND', 'Game not found');
+    if (gameService.isLive(game)) {
+        const validation = await gameService.validatePublication(game);
+        if (!validation.publishable) throw new ApiError(400, 'NOT_PUBLISHABLE', validation.missing.join('; '));
+    }
+    const data = await require('../services/gameDataService').prepare(game);
+    res.set('Content-Disposition', 'attachment; filename="gameData.json"');
+    res.type('application/json').send(JSON.stringify(data, null, 2) + '\n');
+});
+exports.recoverGameData = asyncHandler(async (req, res) => {
+    return sendSuccess(res, await gameService.mutate(req.params.id, () => {}, undefined, undefined, true));
+});
+exports.syncGameData = asyncHandler(async (req, res) => {
+    return sendSuccess(res, await gameService.mutate(req.params.id, () => {}));
+});
 
 // ==================== CATEGORY CONTROLLERS ====================
 
@@ -145,7 +250,7 @@ exports.getCategories = asyncHandler(async (req, res) => {
 
     // If no manual categories exist, auto-derive from game genres
     if (categories.length === 0) {
-        const games = await Game.find({ isActive: true });
+        const games = await Game.find({ isActive: true, isDisabled: { $ne: true } });
         const genreMap = {};
 
         games.forEach((game) => {

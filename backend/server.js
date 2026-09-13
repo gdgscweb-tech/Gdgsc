@@ -97,9 +97,10 @@ app.use(express.json()); // For JSON data
 app.use(express.urlencoded({ extended: false })); // For form data
 
 // Session Middleware (needed for Passport.js OAuth flows)
+let mongoUrl;
 if (process.env.NODE_ENV !== "test") {
   try {
-    const mongoUrl = getMongoUri();
+    mongoUrl = getMongoUri();
     app.use(
       session({
         secret: process.env.SESSION_SECRET || "gdgsc_session_secret",
@@ -127,7 +128,7 @@ if (process.env.NODE_ENV !== "test") {
 
 // Passport middleware
 app.use(passport.initialize());
-if (process.env.NODE_ENV !== "test" && process.env.MONGO_URI) {
+if (process.env.NODE_ENV !== "test" && mongoUrl) {
   app.use(passport.session());
 }
 
@@ -136,6 +137,7 @@ app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/user", require("./src/routes/userRoutes"));
 app.use("/api/events", require("./src/routes/eventRoutes"));
 app.use("/api/registrations", require("./src/routes/registrationRoutes"));
+app.use("/api/recruitments", require("./src/routes/recruitmentRoutes"));
 
 // Game Assets & File Storage Routes
 app.use("/api/assets", require("./src/routes/assetRoutes"));
@@ -144,7 +146,15 @@ if (isGamesEnabled) {
   // Serve legacy local game assets as static fallback if needed
   app.use(
     "/api/games/assets",
-    express.static(path.join(__dirname, "src/games")),
+    require('express-async-handler')(async (req, res, next) => {
+      if (path.extname(req.path).toLowerCase() === '.json') return res.sendStatus(404);
+      const reference = '/api/games/assets' + decodeURIComponent(req.path);
+      const game = await require('./src/models/Game').findOne({ isActive: true, isDisabled: { $ne: true },
+        $or: ['image','banner','screenshots','videos','gameLink'].map(field => ({[field]: reference})) });
+      if (!game) return res.sendStatus(404);
+      res.set('Cache-Control', 'no-store'); next();
+    }),
+    express.static(path.join(__dirname, 'src/games'), { cacheControl: false }),
   );
   app.use("/api/games", require("./src/routes/gamesRoutes"));
 } else {

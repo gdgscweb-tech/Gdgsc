@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const User = require("./src/models/User");
 const Event = require("./src/models/Event");
 const Registration = require("./src/models/Registration");
+const { getMongoUri } = require("./src/config/db");
 
 // Environment check - prevent running in production
 const environment = process.env.NODE_ENV || "development";
@@ -27,7 +28,7 @@ console.log(`\n🔧 Running in ${environment.toUpperCase()} mode\n`);
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(getMongoUri());
     console.log("✅ MongoDB connected successfully");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);

@@ -104,11 +104,12 @@ const main = async () => {
     };
 
     data.image = await resolve(data.image);
+    if (data.banner) data.banner = await resolve(data.banner);
     data.screenshots = await Promise.all(
-      (Array.isArray(data.screenshots) ? data.screenshots : []).map(resolve),
+      (Array.isArray(data.screenshots) ? data.screenshots : []).map(value => resolve(value)),
     );
     data.videos = await Promise.all(
-      (Array.isArray(data.videos) ? data.videos : []).map(resolve),
+      (Array.isArray(data.videos) ? data.videos : []).map(value => resolve(value)),
     );
     data.gameLink = await resolve(data.gameLink, true);
 

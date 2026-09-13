@@ -66,12 +66,12 @@ const MeetTeam = () => {
       color: "team-white",
       members: [
         {
-          name: "Vedaant Budakoti",
+          name: "Simant Pandit",
           role: "Game Dev",
-          linkedin: "https://www.linkedin.com/in/vedaantbudakoti/",
-          instagram: "https://www.instagram.com/vedaant._.vbd/",
-          github: "https://github.com/Vedaant-VBD",
-          photo: "/images/meetteam/OfficeBearers/Chairman/vedaant(president).jpg",
+          linkedin: "https://www.linkedin.com/in/simant-pandit-634a13312",
+          instagram: "https://www.instagram.com/simant._pandit/",
+          github: "https://github.com/Patagobhi",
+          photo: "/images/meetteam/TeamUnreal/SimantPandit1.jpg",
         },
         {
           name: "Kavya Sharma",

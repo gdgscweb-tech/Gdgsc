@@ -1,6 +1,9 @@
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+const { getEnvironment } = require('./db');
+
+const getEventStorageFolder = () => `event-images/${getEnvironment()}`;
 
 // ------------------------------------------------------
 // 🔵 Validate Cloudinary ENV variables
@@ -42,7 +45,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: 'event-images',
+        folder: getEventStorageFolder(),
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         transformation: [{ width: 1200, height: 630, crop: 'limit' }],
         public_id: (req, file) => {
@@ -112,6 +115,7 @@ const handleUploadError = (err, req, res, next) => {
 module.exports = {
     cloudinary,
     upload,
-    handleUploadError
+    handleUploadError,
+    getEventStorageFolder,
 };
 

@@ -12,6 +12,9 @@ const optionalAuth = require("../middleware/optionalAuth");
 // GET /api/assets/drive/:fileId — Stream a private Google Drive file
 router.get("/drive/:fileId", optionalAuth, assetController.proxyDriveFile);
 
+// GET    /api/assets/:assetId/content — Provider-backed asset content URL
+router.get("/:assetId/content", optionalAuth, assetController.getAssetContent);
+
 // GET    /api/assets/:assetId         — Get asset metadata (public for public assets, auth for private)
 router.get("/:assetId", optionalAuth, assetController.getAssetById);
 

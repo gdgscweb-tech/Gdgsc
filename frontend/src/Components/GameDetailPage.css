@@ -118,7 +118,9 @@
   color: #ffffff;
   margin: 0 0 0.5rem 0;
   letter-spacing: 1.5px;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  background: none;
+  -webkit-text-fill-color: #ffffff;
+  text-shadow: none;
 }
 
 .detail-developer-row {

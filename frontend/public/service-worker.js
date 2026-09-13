@@ -1,11 +1,14 @@
 // frontend/public/service-worker.js
 // GDGSC Vault & Media Cache-First Service Worker
 
-const CACHE_NAME = 'gdgsc-media-cache-v1';
+const CACHE_NAME = 'gdgsc-media-cache-v2';
 
 // Match media assets: Google Drive proxy files, local static images, logos, uploads
 const isMediaRequest = (url, request) => {
   if (request.method !== 'GET') return false;
+  // Game assets are access-controlled and may be unpublished. Keep static/team caching.
+  if (url.pathname.startsWith('/api/assets/') && url.searchParams.get('cache') !== 'team') return false;
+  if (url.pathname.startsWith('/api/games/')) return false;
 
   // Destination check
   if (request.destination === 'image') return true;

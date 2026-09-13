@@ -8,6 +8,15 @@ const EventSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
+    // Optional stable identifier for programmatic lookup (e.g. "gdgsc-recruitments-2026").
+    // Sparse so existing events with no slug don't collide on the unique index.
+    slug: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+        lowercase: true,
+    },
     name: {
         type: String,
         required: true,

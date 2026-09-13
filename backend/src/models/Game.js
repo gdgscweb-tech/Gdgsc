@@ -56,7 +56,11 @@ const GameSchema = new mongoose.Schema(
     },
     image: {
       type: String, // Cover image URL (can be R2 public URL or local/external URL)
-      required: true,
+      default: "",
+    },
+    banner: {
+      type: String,
+      default: "",
     },
     screenshots: {
       type: [String],
@@ -96,6 +100,10 @@ const GameSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isDisabled: { type: Boolean, default: false },
+    managementHeartbeat: { type: Date, select: false },
+    managementLock: { type: String, default: null, select: false },
+    gameDataSync: { type: mongoose.Schema.Types.Mixed, default: null },
     isActive: {
       type: Boolean,
       default: true,
@@ -104,6 +112,7 @@ const GameSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
@@ -112,6 +121,8 @@ const GameSchema = new mongoose.Schema(
         if (!ret.name && ret.title) ret.name = ret.title;
         if (!ret.title && ret.name) ret.title = ret.name;
         delete ret.__v;
+        delete ret.managementLock;
+        delete ret.managementHeartbeat;
         return ret;
       },
     },

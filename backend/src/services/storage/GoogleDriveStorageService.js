@@ -2,18 +2,21 @@
 
 const crypto = require("crypto");
 const path = require("path");
+const fs = require("fs");
 const axios = require("axios");
 const IStorageService = require("./IStorageService");
 const storageConfig = require("../../config/storageConfig");
+const { getStorageRootConfig } = storageConfig;
 
 /**
  * Google Drive Storage Service implementation of IStorageService.
  * Supports:
- *  - Google Drive Resumable Upload sessions (Zero backend proxying for client uploads)
- *  - Service Account JWT authentication (native crypto, no external heavy SDK)
+ *  - Google Drive Resumable Upload sessions
+ *  - Service Account JWT authentication
  *  - OAuth2 Refresh Token authentication
  *  - Direct download URLs and Google CDN preview links
  *  - Metadata retrieval, object existence checks, and deletion
+ *  - Strict failures; uploads are never simulated
  */
 class GoogleDriveStorageService extends IStorageService {
   /**
@@ -30,7 +33,10 @@ class GoogleDriveStorageService extends IStorageService {
   constructor(options = {}) {
     super();
     const gdConfig = storageConfig.googleDrive || {};
-    this.folderId = options.folderId !== undefined ? options.folderId : gdConfig.folderId;
+    const rootConfig = options.folderId === undefined ? getStorageRootConfig() : null;
+    this.folderId = options.folderId !== undefined ? options.folderId : rootConfig.folderId;
+    this.storageEnvironment = options.environment || rootConfig?.environment || "explicit";
+    this.storageRootVariable = rootConfig?.variable || "explicit option";
     this.clientEmail = options.clientEmail !== undefined ? options.clientEmail : gdConfig.clientEmail;
     this.privateKey = options.privateKey !== undefined ? options.privateKey : gdConfig.privateKey;
     this.clientId = options.clientId !== undefined ? options.clientId : gdConfig.clientId;
@@ -41,24 +47,131 @@ class GoogleDriveStorageService extends IStorageService {
 
     // In-memory token cache: { token, expiresAt }
     this._tokenCache = null;
+    this._rootChecks = new Map();
 
-    // In-memory mock registry for tests / simulated mode when credentials are not configured
-    this._mockObjects = new Map();
+
+  }
+
+  async requireToken() {
+    const token = await this.getAccessToken();
+    if (!token) throw new Error("Google Drive authentication failed; no files were simulated");
+    return token;
+  }
+
+  async driveRequest(method, suffix, data, params = {}) {
+    const token = await this.requireToken();
+    const response = await this.httpClient.request({
+      method, url: `https://www.googleapis.com/drive/v3/${suffix}`, data,
+      params: { supportsAllDrives: true, ...params },
+      headers: { Authorization: `Bearer ${token}` }, timeout: 30000,
+    });
+    return response.data;
+  }
+
+  async listChildren(parentId) {
+    const files = [];
+    let pageToken;
+    do {
+      const result = await this.driveRequest('get', 'files', undefined, {
+        q: `'${parentId.replace(/'/g, "\\'")}' in parents and trashed = false`,
+        fields: 'nextPageToken,files(id,name,mimeType,parents,properties)',
+        pageSize: 1000, pageToken, includeItemsFromAllDrives: true,
+      });
+      files.push(...(result.files || []));
+      pageToken = result.nextPageToken;
+    } while (pageToken);
+    return files;
+  }
+
+  // Every read/mutation of a referenced game file must stay under this root.
+  async assertInRoot(fileId) {
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) throw new Error('Missing or invalid Drive file ID');
+    if ((this._rootChecks.get(fileId) || 0) > Date.now()) return true;
+    const visited = new Set();
+    const visit = async (id) => {
+      if (id === this.folderId) return true;
+      if (!id || visited.has(id) || visited.size > 50) return false;
+      visited.add(id);
+      const file = await this.driveRequest('get', `files/${encodeURIComponent(id)}`, undefined,
+        { fields: 'id,parents,trashed' });
+      if (file.trashed) return false;
+      for (const parent of file.parents || []) if (await visit(parent)) return true;
+      return false;
+    };
+    if (!(await visit(fileId))) throw new Error('Drive reference is outside the configured environment root');
+    if (this._rootChecks.size > 1000) this._rootChecks.clear();
+    this._rootChecks.set(fileId, Date.now() + 30000);
+    return true;
+  }
+
+  async ensureFolder(parentId, name) {
+    if (!name || /[\\/\x00-\x1f]/.test(name) || name === '.' || name === '..') {
+      throw new Error('Invalid game folder name');
+    }
+    const matches = (await this.listChildren(parentId)).filter(f => f.name === name);
+    if (matches.length > 1 || (matches[0] && matches[0].mimeType !== 'application/vnd.google-apps.folder')) {
+      throw new Error('Ambiguous Drive folder; resolve duplicate names before continuing');
+    }
+    return matches[0] || this.driveRequest('post', 'files', {
+      name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId],
+    });
+  }
+
+  async getDriveFileDetails(fileId) {
+    if (!fileId || !/^[a-zA-Z0-9_-]{10,200}$/.test(fileId)) {
+      throw new (require('../../utils/apiResponse').ApiError)(400, 'INVALID_DRIVE_FILE_ID', 'Enter the file ID from the Drive link, not the entire URL.');
+    }
+    try {
+      return await this.driveRequest('get', `files/${encodeURIComponent(fileId)}`, undefined,
+        { fields: 'id,name,mimeType,size,md5Checksum,parents,trashed,properties,capabilities(canEdit,canDownload)' });
+    } catch (error) {
+      const { ApiError } = require('../../utils/apiResponse');
+      if (error.response?.status === 404) throw new ApiError(404, 'DRIVE_FILE_UNAVAILABLE', 'Drive file was not found or is not accessible to the backend service account. Check the ID and sharing permissions.');
+      if (error.response?.status === 403) throw new ApiError(403, 'DRIVE_FILE_INACCESSIBLE', 'Drive denied the backend service account access to this file. Share the correct folder with the service account.');
+      throw new ApiError(503, 'DRIVE_UNAVAILABLE', 'Unable to read Drive metadata. Retry after checking the storage connection.');
+    }
+  }
+
+  async writeGameData({ gameId, folderName, content }) {
+    JSON.parse(content);
+    // A deterministic path within the environment root; legacy per-game folder names survive.
+    const games = await this.ensureFolder(this.folderId, 'games');
+    const folder = await this.ensureFolder(games.id, folderName);
+    const matches = (await this.listChildren(folder.id)).filter(f => f.name === 'gameData.json');
+    if (matches.length > 1) throw new Error('Multiple gameData.json files found; refusing ambiguous update');
+    let file = matches[0];
+    if (file?.properties?.gameId && file.properties.gameId !== gameId) {
+      throw new Error('Game data folder belongs to another game');
+    }
+    const token = await this.requireToken();
+    if (!file) {
+      const boundary = 'gdgsc_' + crypto.randomBytes(12).toString('hex');
+      const metadata = { name: 'gameData.json', mimeType: 'application/json', parents: [folder.id],
+        properties: { gameId, storageKey: `games/${folderName}/gameData.json` } };
+      const body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${content}\r\n--${boundary}--`;
+      const response = await this.httpClient.post('https://www.googleapis.com/upload/drive/v3/files', body, {
+        params: { uploadType: 'multipart', supportsAllDrives: true },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': `multipart/related; boundary=${boundary}` }, timeout: 30000,
+      });
+      file = response.data;
+    } else {
+      await this.httpClient.patch(
+        `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(file.id)}`,
+        content, { params: { uploadType: 'media', supportsAllDrives: true },
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, timeout: 30000 });
+    }
+
+    return { fileId: file.id, folderId: folder.id, storageKey: `games/${folderName}/gameData.json` };
   }
 
   /**
    * Helper: Extracts file ID from storage key or raw ID.
-   * Accepts:
-   *   - "1BxiMVs0XRA5nFMdKvBHKVNbdB20Dp5W_e"
-   *   - "gdrive:1BxiMVs0XRA5nFMdKvBHKVNbdB20Dp5W_e"
-   *   - "games/cyber-racer/files/v1.0.0/build.zip" (fallback hash/slug)
    */
   extractFileId(key) {
     if (!key) return null;
     if (key.startsWith("gdrive:")) {
       return key.replace(/^gdrive:/, "");
     }
-    // Google Drive file IDs are typically 25-50 characters alphanumeric with dashes and underscores
     if (/^[a-zA-Z0-9_-]{25,50}$/.test(key)) {
       return key;
     }
@@ -70,13 +183,12 @@ class GoogleDriveStorageService extends IStorageService {
    * Cached until 60 seconds before expiration.
    */
   async getAccessToken() {
-    // Check cache
     const nowSec = Math.floor(Date.now() / 1000);
     if (this._tokenCache && this._tokenCache.expiresAt > nowSec + 60) {
       return this._tokenCache.token;
     }
 
-    // 1. Service Account Authentication (JWT RS256)
+    // Existing service-account-first authentication.
     if (this.clientEmail && this.privateKey) {
       try {
         const header = { alg: "RS256", typ: "JWT" };
@@ -138,13 +250,11 @@ class GoogleDriveStorageService extends IStorageService {
       }
     }
 
-    // Fallback: No credentials configured (Development / Testing Mode)
     return null;
   }
 
   /**
-   * Generates a direct Google Drive Resumable Upload session URI.
-   * Client PUTs binary payload directly to Google Drive (Zero Backend Proxying).
+   * Generates a Google Drive Resumable Upload session URI.
    */
   async createUploadUrl({
     key,
@@ -158,7 +268,6 @@ class GoogleDriveStorageService extends IStorageService {
     const filename = path.basename(key);
     const token = await this.getAccessToken();
 
-    // If active Google Drive token is available, initiate real Resumable Upload session
     if (token) {
       const metadata = {
         name: filename,
@@ -177,261 +286,140 @@ class GoogleDriveStorageService extends IStorageService {
         headers["X-Upload-Content-Length"] = size.toString();
       }
 
-      const response = await this.httpClient.post(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
-        metadata,
-        { headers },
-      );
+      try {
+        const response = await this.httpClient.post(
+          "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true",
+          metadata,
+          { headers },
+        );
 
-      const resumableSessionUrl = response.headers["location"] || response.headers["Location"];
-      if (resumableSessionUrl) {
-        return resumableSessionUrl;
+        const resumableSessionUrl =
+          response.headers["location"] || response.headers["Location"];
+        if (resumableSessionUrl) {
+          return resumableSessionUrl;
+        }
+      } catch (sessionErr) {
+        console.warn(
+          "[GoogleDrive] Resumable session creation failed:",
+          sessionErr.response?.data?.error?.message || sessionErr.message,
+        );
       }
     }
 
-    // Fallback URL for development or testing environments
-    const mockUploadUrl = `https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${encodeURIComponent(
-      key,
-    )}`;
+    throw new Error("Google Drive upload session failed; upload was not stored");
+  }
 
-    // Store in mock registry so verification tests pass
-    this._mockObjects.set(key, {
-      key,
-      filename,
-      contentType,
-      size: size || 1024,
-      createdAt: new Date(),
-    });
+  /**
+   * Uploads a local file through the backend using a Drive resumable session.
+   * The browser never receives the Drive session or service-account credentials.
+   */
+  async uploadFile({ key, filePath, contentType, size }) {
+    const token = await this.getAccessToken();
 
-    return mockUploadUrl;
+    // Step 1: Create the Drive resumable upload session (returns self-authenticated URL or mock URL)
+    const uploadUrl = await this.createUploadUrl({ key, contentType, size });
+
+    if (!token || !uploadUrl) throw new Error("Google Drive upload unavailable");
+
+    try {
+      // Step 2: PUT the file stream directly to the resumable session URL.
+      const response = await this.httpClient.put(uploadUrl, fs.createReadStream(filePath), {
+        headers: {
+          "Content-Type": contentType || "application/octet-stream",
+          ...(size ? { "Content-Length": String(size) } : {}),
+        },
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+        validateStatus: (status) => status >= 200 && status < 300,
+      });
+
+      const fileId = response.data?.id || null;
+      return { key, fileId, metadata: response.data || null };
+    } catch (putErr) {
+      const errMsg = putErr.response?.data?.error?.message || putErr.message;
+      console.warn(
+        `[GoogleDrive] PUT file stream failed (${putErr.response?.status || "ERR"}):`,
+        errMsg,
+      );
+      throw new Error(`Google Drive upload failed: ${errMsg}`);
+    }
+  }
+
+  async makePublic({ key, fileId }) {
+    await this.assertInRoot(fileId || this.extractFileId(key));
+    const resolvedFileId = fileId || this.extractFileId(key);
+    const token = await this.getAccessToken();
+    if (!token || !resolvedFileId || String(resolvedFileId).startsWith("mock-")) {
+      return false;
+    }
+
+    try {
+      await this.httpClient.post(
+        `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(resolvedFileId)}/permissions?supportsAllDrives=true`,
+        { role: "reader", type: "anyone" },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**
    * Initiates multipart / chunked resumable upload session on Google Drive.
    */
-  async createMultipartUpload({ key, contentType, metadata = {} }) {
-    if (!key) throw new Error("Object key is required");
-
-    const uploadUrl = await this.createUploadUrl({
-      key,
-      contentType: contentType || "application/octet-stream",
-    });
-
-    // Extract uploadId from Google session URL or generate a unique tracking ID
-    const uploadIdMatch = uploadUrl.match(/[?&]upload_id=([^&]+)/);
-    const uploadId = uploadIdMatch
-      ? decodeURIComponent(uploadIdMatch[1])
-      : `gdrive-upload-${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
-
-    return {
-      uploadId,
-      key,
-      uploadUrl,
-    };
-  }
-
-  /**
-   * Returns the resumable upload URL for uploading a chunk / part.
-   * Google Drive Resumable Upload sessions receive chunks via PUT with Content-Range header.
-   */
-  async signPart({
-    key,
-    uploadId,
-    partNumber,
-    expiresIn = storageConfig.presignedExpiry.upload,
-  }) {
-    if (!key) throw new Error("Object key is required");
-    if (!uploadId) throw new Error("UploadId is required");
-    if (!partNumber || partNumber < 1) {
-      throw new Error("Valid partNumber is required");
-    }
-
-    // The Google Drive resumable session URL accepts part uploads
-    const presignedUrl = `https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${encodeURIComponent(
-      uploadId,
-    )}&partNumber=${partNumber}`;
-
-    return presignedUrl;
-  }
-
-  /**
-   * Completes a multipart / chunked upload on Google Drive.
-   * Verifies file integrity, updates permissions, and records checksum.
-   */
-  async completeMultipartUpload({ key, uploadId, parts }) {
-    if (!key) throw new Error("Object key is required");
-    if (!uploadId) throw new Error("UploadId is required");
-    if (!Array.isArray(parts) || parts.length === 0) {
-      throw new Error("Non-empty parts array is required");
-    }
-
-    const fileId = this.extractFileId(key);
-    const token = await this.getAccessToken();
-
-    let etag = null;
-    if (token) {
-      try {
-        const metaRes = await this.httpClient.get(
-          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=id,md5Checksum,size`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        etag = metaRes.data.md5Checksum || null;
-
-        // Set public read permission
-        await this.httpClient.post(
-          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}/permissions`,
-          { role: "reader", type: "anyone" },
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-      } catch (err) {
-        // Fallback for mocked or pending completion
-      }
-    }
-
-    if (!etag) {
-      etag = crypto.createHash("md5").update(key).digest("hex");
-    }
-
-    return {
-      location: this.getPublicUrl({ key }),
-      etag,
-      key,
-    };
-  }
-
-  /**
-   * Aborts an active resumable upload session on Google Drive.
-   */
-  async abortMultipartUpload({ key, uploadId }) {
-    if (!key) throw new Error("Object key is required");
-    if (!uploadId) throw new Error("UploadId is required");
-
-    const token = await this.getAccessToken();
-    if (token && uploadId.startsWith("http")) {
-      try {
-        await this.httpClient.delete(uploadId, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } catch (err) {
-        // Ignored if session already terminated
-      }
-    }
-
-    this._mockObjects.delete(key);
-    return true;
-  }
+  async createMultipartUpload() { throw new Error('Drive multipart is unsupported; use backend upload-file'); }
+  async signPart() { throw new Error('Drive multipart is unsupported; use backend upload-file'); }
+  async completeMultipartUpload() { throw new Error('Drive multipart is unsupported; use backend upload-file'); }
+  async abortMultipartUpload() { throw new Error('Drive multipart is unsupported; use backend upload-file'); }
 
   /**
    * Generates a direct Google Drive download or streaming URL.
    */
   async createDownloadUrl({
     key,
+    fileId,
     expiresIn = storageConfig.presignedExpiry.download,
     responseContentDisposition,
   }) {
     if (!key) throw new Error("Object key is required");
 
-    const fileId = this.extractFileId(key);
-
-    // Direct Google Drive download endpoint
-    return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+    const resolvedFileId = fileId || this.extractFileId(key);
+    return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(resolvedFileId)}`;
   }
 
   /**
    * Deletes a file from Google Drive.
    */
-  async deleteObject({ key }) {
-    if (!key) throw new Error("Object key is required");
-
-    const fileId = this.extractFileId(key);
-    const token = await this.getAccessToken();
-
-    if (token) {
-      try {
-        await this.httpClient.delete(
-          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        return true;
-      } catch (err) {
-        if (err.response && err.response.status === 404) {
-          return false;
-        }
-        console.warn(`[GoogleDrive] Delete failed for '${key}':`, err.message);
-      }
-    }
-
-    this._mockObjects.delete(key);
+  async deleteObject({ key, fileId }) {
+    const id = fileId || this.extractFileId(key);
+    await this.assertInRoot(id);
+    await this.driveRequest('delete', `files/${encodeURIComponent(id)}`);
     return true;
   }
 
-  /**
-   * Checks if a file exists in Google Drive.
-   */
-  async objectExists({ key }) {
+  async objectExists({ key, fileId }) {
     if (!key) return false;
-
-    const fileId = this.extractFileId(key);
-    const token = await this.getAccessToken();
-
-    if (token) {
-      try {
-        const res = await this.httpClient.get(
-          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=id,trashed`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        return res.data && !res.data.trashed;
-      } catch (err) {
-        if (err.response && err.response.status === 404) {
-          return false;
-        }
-        // If API error, fallback to mock check
-      }
+    try {
+      await this.assertInRoot(fileId || this.extractFileId(key));
+      return true;
+    } catch (error) {
+      if (error.response?.status === 404) return false;
+      throw error;
     }
-
-    return this._mockObjects.has(key);
   }
 
-  /**
-   * Fetches metadata for an object from Google Drive.
-   */
-  async getObjectMetadata({ key }) {
-    if (!key) throw new Error("Object key is required");
-
-    const fileId = this.extractFileId(key);
-    const token = await this.getAccessToken();
-
-    if (token) {
-      try {
-        const res = await this.httpClient.get(
-          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(
-            fileId,
-          )}?fields=id,size,mimeType,md5Checksum,modifiedTime`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        return {
-          contentLength: parseInt(res.data.size, 10) || 0,
-          contentType: res.data.mimeType || "application/octet-stream",
-          etag: res.data.md5Checksum || null,
-          lastModified: res.data.modifiedTime ? new Date(res.data.modifiedTime) : new Date(),
-        };
-      } catch (err) {
-        console.warn(`[GoogleDrive] getObjectMetadata failed for '${key}':`, err.message);
-      }
-    }
-
-    const mock = this._mockObjects.get(key) || {};
-    return {
-      contentLength: mock.size || 1048576,
-      contentType: mock.contentType || "application/octet-stream",
-      etag: crypto.createHash("md5").update(key).digest("hex"),
-      lastModified: mock.createdAt || new Date(),
-    };
+  async getObjectMetadata({ key, fileId }) {
+    const id = fileId || this.extractFileId(key);
+    await this.assertInRoot(id);
+    const file = await this.driveRequest('get', `files/${encodeURIComponent(id)}`, undefined,
+      { fields: 'id,size,mimeType,md5Checksum,modifiedTime' });
+    return { contentLength: Number(file.size) || 0, contentType: file.mimeType,
+      etag: file.md5Checksum || null, lastModified: new Date(file.modifiedTime), fileId: file.id };
   }
 
   /**
    * Streams a private Drive file through the backend without exposing Drive credentials.
-   * Supports HTTP range requests for video playback and resumable downloads.
    */
   async getFileStream({ fileId, range }) {
     if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
@@ -445,7 +433,7 @@ class GoogleDriveStorageService extends IStorageService {
     if (range) headers.Range = range;
 
     return this.httpClient.get(
-      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
+      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?supportsAllDrives=true&alt=media`,
       {
         headers,
         responseType: "stream",
@@ -456,23 +444,26 @@ class GoogleDriveStorageService extends IStorageService {
 
   /**
    * Returns a direct public link for viewing or embedding.
-   * Uses Google CDN thumbnail / preview for images and uc export for downloads.
    */
-  getPublicUrl({ key }) {
+  getPublicUrl({ key, fileId }) {
     if (!key) return null;
 
-    const fileId = this.extractFileId(key);
+    const resolvedFileId = fileId || this.extractFileId(key);
     const ext = path.extname(key).toLowerCase();
 
-    // Fast Google image hosting CDN format for images
-    if ([".png", ".jpg", ".jpeg", ".webp", ".gif"].includes(ext)) {
-      return `https://lh3.googleusercontent.com/d/${encodeURIComponent(fileId)}`;
+    if (!resolvedFileId || String(resolvedFileId).startsWith("mock-")) {
+      if ([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"].includes(ext)) {
+        return "https://images.unsplash.com/photo-1542751371-adc38448a05e";
+      }
+      return "https://placehold.co/1200x675/11121a/ffd700?text=ASSET+PREVIEW";
     }
 
-    // Direct download/view link
-    return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+    if ([".png", ".jpg", ".jpeg", ".webp", ".gif"].includes(ext)) {
+      return `https://lh3.googleusercontent.com/d/${encodeURIComponent(resolvedFileId)}`;
+    }
+
+    return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(resolvedFileId)}`;
   }
 }
 
 module.exports = GoogleDriveStorageService;
-

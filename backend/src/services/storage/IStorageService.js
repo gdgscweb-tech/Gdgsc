@@ -23,6 +23,15 @@ class IStorageService {
   }
 
   /**
+   * Uploads a local file through the backend to the configured provider.
+   * @param {object} params
+   * @returns {Promise<{fileId?: string}>}
+   */
+  async uploadFile(params) {
+    throw new Error("uploadFile() must be implemented by storage provider");
+  }
+
+  /**
    * Initiates a multipart upload for large files.
    * @param {object} params
    * @param {string} params.key - Storage object key

@@ -60,7 +60,7 @@ const Banner = ({ games = [], onGameClick }) => {
         {/* Background Image with Ambient Glow */}
         <div className="hero-bg-layer">
           <img
-            src={resolveApiUrl(current.image)}
+            src={resolveApiUrl(current.banner || current.image)}
             alt={current.title}
             className="hero-bg-img"
             key={`bg-${currentIndex}`}
@@ -152,7 +152,7 @@ const Banner = ({ games = [], onGameClick }) => {
 
               <div className="thumb-img-wrapper">
                 <img
-                  src={resolveApiUrl(game.image)}
+                  src={resolveApiUrl(game.banner || game.image)}
                   alt={game.title}
                   loading="lazy"
                   decoding="async"

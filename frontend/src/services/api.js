@@ -19,6 +19,15 @@ const API_BASE_URL = isProduction
 // Resolve those paths against the API host before assigning them to media links.
 export const resolveApiUrl = (value) => {
   if (!value || typeof value !== "string") return value;
+
+  // Automatically normalize Google Drive share/view URLs to the backend Drive proxy
+  const driveMatch = value.match(
+    /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:[^&]+&)*id=)([a-zA-Z0-9_-]+)/i
+  );
+  if (driveMatch) {
+    return `${API_BASE_URL.replace(/\/$/, "")}/api/assets/drive/${driveMatch[1]}`;
+  }
+
   if (/^(?:https?:|data:|blob:)/i.test(value)) return value;
   if (value.startsWith("/")) {
     return `${API_BASE_URL.replace(/\/$/, "")}${value}`;
@@ -50,9 +59,14 @@ const api = axios.create({
 // Request Interceptor: Add JWT token to every request
 api.interceptors.request.use(
   (config) => {
+    if (config.url?.startsWith("/api/games") && config.timeout === 10000) config.timeout = 120000;
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Let Axios/browser set the multipart boundary for FormData requests.
+    if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },

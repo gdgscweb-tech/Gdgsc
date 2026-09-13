@@ -20,15 +20,21 @@ const Gamepage = () => {
   const [activeTab, setActiveTab] = useState("discover"); // 'discover' | 'browse'
 
   // Fetch games and categories from the backend API
-  const fetchStoreData = async () => {
+  const fetchStoreData = async (quiet = false) => {
     try {
-      setLoading(true);
+      if (!quiet) setLoading(true);
       setError(null);
       const [gamesRes, categoriesRes] = await Promise.all([
-        api.get("/api/games"),
+        api.get("/api/games?envelope=true&limit=100"),
         api.get("/api/games/categories"),
       ]);
-      setGames(gamesRes.data || []);
+      const allGames = [...(gamesRes.data?.data || [])];
+      for (let page = 2; page <= (gamesRes.data?.meta?.pages || 1); page++) {
+        const response = await api.get(`/api/games?envelope=true&limit=100&page=${page}`);
+        allGames.push(...(response.data?.data || []));
+      }
+      setGames(allGames);
+      setSelectedGame(current => current ? allGames.find(game => game._id === current._id) || null : null);
       setCategories(categoriesRes.data || []);
     } catch (err) {
       console.error("Failed to fetch store games data:", err);
@@ -40,6 +46,10 @@ const Gamepage = () => {
 
   useEffect(() => {
     fetchStoreData();
+    const refresh = () => fetchStoreData(true);
+    const timer = setInterval(refresh, 30000);
+    window.addEventListener("focus", refresh);
+    return () => { clearInterval(timer); window.removeEventListener("focus", refresh); };
   }, []);
 
   const handleGameClick = useCallback((game) => {

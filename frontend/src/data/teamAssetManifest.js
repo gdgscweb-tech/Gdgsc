@@ -17,6 +17,7 @@ const teamAssetManifest = {
   "/images/meetteam/TeamUnreal/Aryankumar(TeamUnreal).jpg": "/api/assets/drive/14jDx9lw-JxlpVuaRaV0ShKnXGv29zNL3?cache=team",
   "/images/meetteam/TeamUnreal/KrrishGupta(TeamUnreal).jpg": "/api/assets/drive/1qUoAFYK0XHNAQX0H7KhlaX8o2ueHFAGK?cache=team",
   "/images/meetteam/TeamUnreal/Pragyank.png": "/api/assets/drive/1y5RJu9yqoCKeFq3nvejNZMdv0RWaf8sm?cache=team",
+  "/images/meetteam/TeamUnreal/SimantPandit1.jpg": "/api/assets/drive/12lhWBWFXWQGRKC5m9f5aWlb2ou_qw1Yw?cache=team",
   "/images/meetteam/TeamUnreal/Tushar-_-.jpg": "/api/assets/drive/1f7Izsl3LrWDk_1jWiHzZOGWkXP_aqy3R?cache=team",
   "/images/meetteam/TeamUnreal/VichitraVerma(TeamUnreal).jpg": "/api/assets/drive/17Ih3_nezH1eIaAmLF8sIrY6QLiMhtbbE?cache=team",
   "/images/meetteam/TeamUnreal/Navneet_.jpg": "/api/assets/drive/1k9KUqozHvVbCotc8FABjVovIblOozTgF?cache=team",

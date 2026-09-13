@@ -1,27 +1,35 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Play, Image as ImageIcon, Film } from "lucide-react";
 import "./DetailCarousel.css";
 
 const DetailCarousel = ({ screenshots = [], gameTitle = "Game", mediaItems = [] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlayingVideo, setIsPlayingVideo] = useState(true);
   const videoRef = useRef(null);
 
-  // Normalize media items: prioritize mediaItems, fallback to screenshots
-  const items =
-    mediaItems && mediaItems.length > 0
-      ? mediaItems
-      : (screenshots || []).map((url) => {
-          const isVid =
-            typeof url === "string" &&
-            (url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".ogg"));
-          return { url, isVideo: isVid };
-        });
+  const items = useMemo(() => {
+    if (mediaItems && mediaItems.length > 0) return mediaItems.filter(Boolean);
+    return (screenshots || [])
+      .filter(Boolean)
+      .map((url) => {
+        const isVid =
+          typeof url === "string" &&
+          (url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".ogg"));
+        return { url, isVideo: isVid };
+      });
+  }, [mediaItems, screenshots]);
+
+  // Reset slide if out of bounds
+  useEffect(() => {
+    if (currentSlide >= items.length && items.length > 0) {
+      setCurrentSlide(0);
+    }
+  }, [items.length, currentSlide]);
 
   // Auto-advance if not video
   useEffect(() => {
     if (items.length <= 1) return;
-    if (items[currentSlide]?.isVideo) return; // Never auto-advance when watching a video
+    const activeItem = items[currentSlide % items.length];
+    if (activeItem?.isVideo) return; // Never auto-advance when watching a video
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % items.length);
@@ -31,16 +39,24 @@ const DetailCarousel = ({ screenshots = [], gameTitle = "Game", mediaItems = [] 
   }, [items.length, currentSlide, items]);
 
   const goToPrev = useCallback(() => {
+    if (items.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + items.length) % items.length);
   }, [items.length]);
 
   const goToNext = useCallback(() => {
+    if (items.length === 0) return;
     setCurrentSlide((prev) => (prev + 1) % items.length);
   }, [items.length]);
 
   if (items.length === 0) return null;
 
-  const current = items[currentSlide];
+  const safeSlide =
+    items.length > 0
+      ? (currentSlide % items.length + items.length) % items.length
+      : 0;
+  const current = items[safeSlide];
+  if (!current) return null;
+
 
   return (
     <div className="store-media-showcase">

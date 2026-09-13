@@ -1,31 +1,20 @@
-# Game Media
+# Game media and manual registration
 
-Each game folder owns its page media in `gameData.json`.
+The authoritative procedure is [Manual game upload](../../../docs/manual-game-upload.md).
 
-```json
-{
-  "image": "/api/games/assets/My Game/cover.webp",
-  "screenshots": [
-    "/api/games/assets/My Game/screenshot-1.webp",
-    "/api/games/assets/My Game/screenshot-2.webp"
-  ],
-  "videos": [
-    "/api/games/assets/My Game/trailer.mp4"
-  ]
-}
-```
+Use Game Admin → Manual Game Build Upload to generate the exact environment root,
+filename, version, category/type and MIME requirements. Upload using your Drive account,
+then register the file ID in the admin UI. Uploading a file alone does not create a GameAsset.
 
-- `image` is the cover shown on cards and the detail page.
-- `screenshots` is the image gallery.
-- `videos` is the video gallery. Videos appear after the screenshots.
-- Put the files in the same game folder and update only these paths when replacing media.
-- Supported browser video formats are `.mp4`, `.webm`, and `.ogg`.
+Binaries are currently flat files directly under the environment root. Their `games/...`
+storage keys are logical metadata, not physical directories to create. Legacy imported
+folders and per-game gameData.json copies are distinct from this binary upload convention.
 
-The current Drive workflow is:
+The website reads MongoDB APIs and Game.gameLink. Generated gameData.json is a legacy
+mirror; the admin panel can download it for one-time human-owned setup without hand editing.
+Subsequent registrations and game mutations attempt to update the mirror through the
+existing service account. Pending synchronization is reported in admin.
 
-1. Upload the `backend/src/games` folder into `WEB_GAME_ASSETS` as `games`.
-2. Run `npm run sync-games-drive-urls` from `backend`.
-3. Run `npm run load-games` so MongoDB receives the updated Drive URL.
-
-After adding or replacing a local asset, repeat those three steps. Local copies remain in
-the repository as the editable source files.
+Local gameData files are legacy imports. loadGames now skips existing games so admin
+changes are not overwritten, and imported games start as drafts. Do not use disk imports
+as the day-to-day administration workflow.

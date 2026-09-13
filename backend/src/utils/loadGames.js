@@ -10,6 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const Game = require("../models/Games");
+const { getMongoUri } = require("../config/db");
 
 const GAMES_DIR = path.join(__dirname, "../games");
 
@@ -54,12 +55,15 @@ const syncGamesFromDisk = async () => {
       const existing = await Game.findOne({ title: data.title });
 
       if (existing) {
-        Object.assign(existing, data);
-        await existing.save();
-        console.log(`🔄 Updated "${data.title}"`);
-        results.updated++;
+        console.log(`Skipped existing admin-managed game "${data.title}"`);
+        results.skipped++;
       } else {
-        await Game.create(data);
+        const storage = require('../services/storage/storageFactory').getDefaultStorageService();
+        const service = require('../services/gameService');
+        for (const [category, urls] of [['thumbnail',[data.image]],['screenshot',data.screenshots],['trailer',data.videos],['build',[data.gameLink]]]) {
+          for (const url of urls || []) if (url && url !== '#') await service.validateReference(data, category, url, storage);
+        }
+        await service.createGame({ ...data, isActive: false });
         console.log(`✅ Created "${data.title}"`);
         results.created++;
       }
@@ -76,7 +80,7 @@ const syncGamesFromDisk = async () => {
 if (require.main === module) {
   (async () => {
     try {
-      await mongoose.connect(process.env.MONGO_URI);
+      await mongoose.connect(getMongoUri());
       console.log("✅ MongoDB connected");
       console.log(`\n📂 Scanning ${GAMES_DIR}\n`);
 
