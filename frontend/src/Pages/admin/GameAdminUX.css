@@ -32,3 +32,18 @@
 .upload-destination span { color: #ffe16a; text-transform: capitalize; }
 .upload-destination strong { color: white; }
 @media(max-width:700px) { .game-editor-nav { top: 64px; } .game-admin-workspace .admin-form-grid { grid-template-columns: 1fr; } .manual-upload-panel dl { grid-template-columns: 1fr; } .game-editor-nav button { padding: 10px 12px; } }
+
+/* Native dropdown popups need an explicit palette as well as the closed control. */
+.game-admin-workspace select {
+  color-scheme: dark;
+  color: #f5f5fa;
+  background-color: #292932;
+}
+.game-admin-workspace select option,
+.game-admin-workspace select optgroup {
+  color: #f5f5fa;
+  background-color: #292932;
+}
+.game-admin-workspace select option:disabled {
+  color: #aaaab8;
+}
