@@ -1,7 +1,7 @@
 // frontend/public/service-worker.js
 // GDGSC Vault & Media Cache-First Service Worker
 
-const CACHE_NAME = 'gdgsc-media-cache-v2';
+const CACHE_NAME = 'gdgsc-media-cache-v3';
 
 // Match media assets: Google Drive proxy files, local static images, logos, uploads
 const isMediaRequest = (url, request) => {
@@ -69,8 +69,8 @@ self.addEventListener('fetch', (event) => {
       try {
         const networkResponse = await fetch(event.request);
 
-        // Cache valid responses (200 or opaque CORS responses type 'opaque')
-        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+        // Cache only confirmed successes. Opaque image responses can hide HTTP 500s.
+        if (networkResponse && networkResponse.status === 200) {
           cache.put(event.request, networkResponse.clone());
         }
 
