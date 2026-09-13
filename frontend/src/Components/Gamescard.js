@@ -133,7 +133,7 @@ const Gamescard = ({
                     </div>
 
                     <span className="card-action-type-pill">
-                      {isDownload ? (
+                      {!game.gameLink || game.gameLink === "#" ? <span>Coming soon</span> : isDownload ? (
                         <>
                           <Download size={11} /> <span>Download</span>
                         </>
