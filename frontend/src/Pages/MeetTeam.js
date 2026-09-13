@@ -6,11 +6,10 @@ import teamAssetManifest from "../data/teamAssetManifest";
 
 const TEAM_FALLBACK = "/images/meetteam/fallback-image.jpg";
 
+// Fixed revision bypasses failed responses cached before the proxy access fix.
 const resolveTeamPhoto = (photo) => {
-  if (!photo) return resolveApiUrl(teamAssetManifest[TEAM_FALLBACK]);
-  const mapped = teamAssetManifest[photo];
-  if (mapped) return resolveApiUrl(mapped);
-  return resolveApiUrl(photo);
+  const mapped = teamAssetManifest[photo || TEAM_FALLBACK];
+  return resolveApiUrl(mapped ? `${mapped}&v=2` : photo);
 };
 
 const MeetTeam = () => {
@@ -589,8 +588,8 @@ const MeetTeam = () => {
                         loading="lazy"
                         decoding="async"
                         onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = resolveTeamPhoto(TEAM_FALLBACK);
+                          const fallback = resolveTeamPhoto(TEAM_FALLBACK);
+                          if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
                         }}
                       />:
                       <img
