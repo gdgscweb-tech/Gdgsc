@@ -258,9 +258,10 @@ exports.proxyDriveFile = asyncHandler(async (req, res) => {
     stream.data.on('error', () => res.destroy());
     res.status(stream.status); stream.data.pipe(res); return;
   }
-  // Preserve only the existing explicit team image allowlist; arbitrary Drive IDs are denied.
-  const manifest = require('fs').readFileSync(require('path').resolve(__dirname, '../../../frontend/src/data/teamAssetManifest.js'), 'utf8');
-  if (!manifest.includes(`/api/assets/drive/${fileId}?cache=team`)) throw new ApiError(404, 'ASSET_NOT_FOUND', 'File is not an application asset');
+  // Public event posters and the deployed team allowlist are independent of game storage.
+  const teamIds = require('../config/teamDriveFileIds.json');
+  const event = teamIds.includes(fileId) ? true : await require('../models/Event').exists({ imageUrl: reference });
+  if (!event) throw new ApiError(404, 'ASSET_NOT_FOUND', 'File is not an application asset');
   const isDownload = req.query.download === "true";
   const etag = `W/"drive-${fileId}"`;
 

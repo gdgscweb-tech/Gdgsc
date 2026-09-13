@@ -14,10 +14,10 @@ const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_FOLDER_MIME = "application/vnd.google-apps.folder";
 const TEAM_IMAGE_PREFIX = "/images/meetteam/";
 const TEAM_PROXY_PREFIX = "/api/assets/drive/";
-const TEAM_PAGE_PATH = path.resolve(__dirname, "../../../frontend/src/Pages/MeetTeam.js");
+const TEAM_PAGE_PATH = path.resolve(__dirname, "../../../../frontend/src/Pages/MeetTeam.js");
 const MANIFEST_PATH = path.resolve(
   __dirname,
-  "../../../frontend/src/data/teamAssetManifest.js",
+  "../../../../frontend/src/data/teamAssetManifest.js",
 );
 
 const authHeaders = (token) => ({ Authorization: `Bearer ${token}` });
@@ -102,6 +102,8 @@ const main = async () => {
     2,
   )};\n\nexport default teamAssetManifest;\n`;
   fs.writeFileSync(MANIFEST_PATH, output);
+  const ids = [...new Set(Object.values(manifest).map(url => url.match(/\/drive\/([^?]+)/)[1]))].sort();
+  fs.writeFileSync(path.resolve(__dirname, '../config/teamDriveFileIds.json'), JSON.stringify(ids, null, 2) + '\n');
   console.log(
     `Team image manifest generated: ${references.length} reference(s), ${driveFiles.size} Drive file(s).`,
   );
