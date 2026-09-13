@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import api, { resolveApiUrl } from "../../services/api";
 import { formatAdminDate, getApiErrorMessage } from "./adminHelpers";
+import "./GameAdminUX.css";
 import ManualGameUploadPanel from "./ManualGameUploadPanel";
 import GameCardPreview from "../../Components/GameCardPreview";
 import GameDetailPreview from "../../Components/GameDetailPreview";
@@ -144,6 +145,8 @@ const UploadProgress = ({ role, uploadingRole, uploadProgress }) => {
 // Main Panel
 // =============================================================================
 const GameAdminPanel = () => {
+  const [editorSection, setEditorSection] = useState("library");
+  const [gameSearch, setGameSearch] = useState("");
   const [validation, setValidation] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [games, setGames] = useState([]);
@@ -161,7 +164,7 @@ const GameAdminPanel = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [previewExpanded, setPreviewExpanded] = useState(true);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
   const fileInputRefs = useRef({});
 
   // ── Data loading ────────────────────────────────────────────────────────────
@@ -224,6 +227,7 @@ const GameAdminPanel = () => {
   };
 
   const editGame = async (game) => {
+    setEditorSection("details");
     revokeAllPreviews(pendingFiles); setPendingFiles(emptyPendingFiles);
     setForm(formFromGame(game));
     setNotice("");
@@ -233,6 +237,7 @@ const GameAdminPanel = () => {
   };
 
   const resetForm = () => {
+    setEditorSection("details");
     revokeAllPreviews(pendingFiles);
     setSelectedGame(null);
     setForm(emptyGame);
@@ -736,7 +741,7 @@ const GameAdminPanel = () => {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="admin-feature-panel">
+    <div className="admin-feature-panel game-admin-workspace">
       <div className="admin-panel-heading">
         <div>
           <h2>Game Management</h2>
@@ -751,7 +756,7 @@ const GameAdminPanel = () => {
           >
             {previewExpanded ? "Hide Preview" : "Show Preview"}
           </button>
-          {selectedGame && <button className="btn btn-secondary" type="button" onClick={resetForm}>New game</button>}
+          <button className="btn btn-primary" type="button" onClick={resetForm}>+ New game</button>
         </div>
       </div>
 
@@ -759,11 +764,18 @@ const GameAdminPanel = () => {
         <div className={`message ${error ? "message-error" : "message-success"}`}>{error || notice}</div>
       )}
 
+      <nav className="game-editor-nav" aria-label="Game editor sections">
+        {[["library", "All games"], ["details", "Game details"], ["media", "Images & videos"], ["builds", "Builds & Drive"], ["publish", "Publish"]].map(([key, label]) => (
+          <button type="button" key={key} aria-current={editorSection === key ? "page" : undefined}
+            disabled={!selectedGame && !["library", "details"].includes(key)} onClick={() => setEditorSection(key)}>{label}</button>
+        ))}
+      </nav>
+      {editorSection !== 'library' && <div className="game-editor-context"><strong>{selectedGame?.title || 'New game'}</strong><span>{selectedGame ? (selectedGame.isDisabled ? 'Disabled' : selectedGame.isActive ? 'Live' : 'Unpublished') : 'Save game details to unlock assets and publishing'}</span></div>}
       <div className="admin-content-stack">
         <div className="admin-form-column">
 
           {/* ─── GAME DETAILS ─────────────────────────────────────────── */}
-          <form className="admin-editor-form" onSubmit={submitGame}>
+          <form hidden={editorSection !== "details"} className="admin-editor-form" onSubmit={submitGame}>
             <h3>{selectedGame ? `Edit: ${selectedGame.title}` : "Create game"}</h3>
             {selectedGame && !selectedGame.isActive && (
               <div className="game-status-banner game-status-unpublished">
@@ -811,11 +823,13 @@ const GameAdminPanel = () => {
                 <input className="form-input" name="year" value={form.year} onChange={updateField} />
               </label>
             </div>
+            <details className="game-advanced"><summary>Advanced asset URLs and storage fields</summary>
             <label className="form-group">Banner URL<input className="form-input" name="banner" value={form.banner} onChange={updateField} /></label>
             <label className="form-group">Screenshot URLs (one per line, in display order)<textarea className="form-textarea" name="screenshots" value={form.screenshots} onChange={updateField} /></label>
             <label className="form-group">Video URLs (one per line, in display order)<textarea className="form-textarea" name="videos" value={form.videos} onChange={updateField} /></label>
             <label className="form-group">Build filename<input className="form-input" name="gameFile" value={form.gameFile} onChange={updateField} /></label>
             <label className="form-group">Drive game folder (fixed after creation)<input className="form-input" name="gameFolder" value={form.gameFolder} onChange={updateField} disabled={Boolean(selectedGame)} /></label>
+            </details>
             <label className="form-group">
               <span className="form-label">Description *</span>
               <textarea className="form-textarea" name="description" value={form.description} onChange={updateField} required />
@@ -838,21 +852,23 @@ const GameAdminPanel = () => {
           {/* ─── ASSET SECTIONS (only when a game is selected) ─────────── */}
           {selectedGame && (
             <>
-              <section aria-live="polite">
-                <h3>Publication checks for saved changes</h3>
+              <section hidden={editorSection !== "publish"} className="admin-editor-form game-publication" aria-live="polite">
+                <h3>Publish your game</h3><p>Save your details first. These checks use the saved version of your game.</p>
                 <p>{validation?.publishable ? 'Ready to publish' : 'Cannot publish yet'}</p>
                 <ul>{validation?.missing?.map(item => <li key={item}>{item}</li>)}</ul>
                 <p>Drive JSON: {selectedGame.gameDataSync?.status || 'Not generated'}</p>
-                <button type="button" disabled={publishing || Boolean(uploadingRole) || (!selectedGame.isActive && !validation?.publishable)} onClick={() => toggleLive(selectedGame)}>{selectedGame.isActive ? 'Unpublish' : 'Publish saved game'}</button>
-                <button type="button" onClick={async () => { try { await api.post(`/api/games/${selectedGame._id}/game-data/sync`); await loadAssets(selectedGame); } catch (e) { setError(getApiErrorMessage(e, 'Sync failed')); } }}>Retry JSON synchronization</button>
-                <button type="button" onClick={async () => { try { await api.post(`/api/games/${selectedGame._id}/game-data/recover`); await loadAssets(selectedGame); } catch (e) { setError(getApiErrorMessage(e, 'Recovery requires an interrupted operation idle for at least two minutes.')); } }}>Recover interrupted synchronization</button>
+                <button className="btn btn-primary" type="button" disabled={publishing || Boolean(uploadingRole) || (!selectedGame.isActive && !validation?.publishable)} onClick={() => toggleLive(selectedGame)}>{selectedGame.isActive ? 'Unpublish' : 'Publish saved game'}</button>
+                <details className="game-advanced"><summary>Advanced: Drive JSON synchronization</summary><button className="btn btn-secondary" type="button" onClick={async () => { try { await api.post(`/api/games/${selectedGame._id}/game-data/sync`); await loadAssets(selectedGame); } catch (e) { setError(getApiErrorMessage(e, 'Sync failed')); } }}>Retry JSON synchronization</button>
+                <button type="button" onClick={async () => { try { await api.post(`/api/games/${selectedGame._id}/game-data/recover`); await loadAssets(selectedGame); } catch (e) { setError(getApiErrorMessage(e, 'Recovery requires an interrupted operation idle for at least two minutes.')); } }}>Recover interrupted synchronization</button></details>
               </section>
+              <div hidden={editorSection !== "builds"}>
               <ManualGameUploadPanel game={selectedGame} assets={assets} onRegistered={async () => { await loadAssets(selectedGame); await loadGames(); }} />
               {/* GAME BUILD */}
               {renderBuildSection()}
+              </div>
 
               {/* GAME ASSETS */}
-              <section className="admin-assets-section">
+              <section hidden={editorSection !== "media"} className="admin-assets-section">
                 <div className="admin-panel-heading">
                   <div>
                     <h3>🖼 Game Assets</h3>
@@ -868,7 +884,8 @@ const GameAdminPanel = () => {
           )}
 
           {/* ─── GAMES LIST ────────────────────────────────────────────── */}
-          <div className="admin-list-section">
+          <div hidden={editorSection !== "library"} className="admin-list-section">
+            <label className="form-group">Find a game<input className="form-input" type="search" placeholder="Search by title, genre or developer" value={gameSearch} onChange={e => setGameSearch(e.target.value)} /></label>
             <div className="admin-panel-heading">
               <div>
                 <h3>Games</h3>
@@ -877,7 +894,8 @@ const GameAdminPanel = () => {
             </div>
             {loading && <p className="admin-state">Loading games…</p>}
             {!loading && !games.length && <p className="admin-state">No games found.</p>}
-            {!loading && games.map((game) => (
+            {!loading && games.length > 0 && !games.some(game => [game.title,game.name,game.genre,game.developer].some(value => value?.toLowerCase().includes(gameSearch.trim().toLowerCase()))) && <p className="admin-state">No matching games. Try another search.</p>}
+            {!loading && games.filter(game => [game.title,game.name,game.genre,game.developer].some(value => value?.toLowerCase().includes(gameSearch.trim().toLowerCase()))).map((game) => (
               <article
                 className={`admin-record ${game.isActive ? "" : "admin-record-muted"}`}
                 key={game._id}
@@ -901,12 +919,12 @@ const GameAdminPanel = () => {
                 </div>
                 <div className="admin-record-actions">
                   <button className="btn btn-secondary" type="button" onClick={() => editGame(game)}>Edit</button>
-                  <button type="button" onClick={() => changeDisabled(game)}>{game.isDisabled ? "Enable as draft" : "Disable"}</button>
+                  <button className="btn btn-secondary" type="button" onClick={() => changeDisabled(game)}>{game.isDisabled ? "Enable as draft" : "Disable"}</button>
                   <button
                     className={`btn ${game.isActive ? "btn-secondary" : "btn-success"}`}
                     type="button"
                     disabled={publishing || game.isDisabled}
-                    onClick={() => game.isActive ? toggleLive(game) : editGame(game)}
+                    onClick={async () => { if (game.isActive) await toggleLive(game); else { await editGame(game); setEditorSection("publish"); } }}
                   >
                     {game.isActive ? "Unpublish" : "Review publication"}
                   </button>

@@ -42,9 +42,9 @@ export default function ManualGameUploadPanel({ game, assets, onRegistered }) {
     const link = document.createElement('a'); link.href = objectUrl; link.download = 'gameData.json';
     document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   });
-  return <section className="admin-editor-form" aria-label="Manual Game Build Upload">
+  return <section className="admin-editor-form manual-upload-panel" aria-label="Manual Game Build Upload">
     <h3>Manual Game Build Upload</h3>
-    <p>Upload with your own Google Drive account, then register the file here. The backend service account verifies it. No MongoDB editing is needed.</p>
+    <p>1. Prepare your file. 2. Upload to Drive. 3. Paste the file ID to connect it to this game.</p>
     <div className="admin-form-grid">
       <label className="form-group">Asset category<select className="form-input" value={category} onChange={e => { setCategory(e.target.value); setReplacement(''); setPlan(null); }}>
         <option value="build">Game build</option><option value="thumbnail">Thumbnail</option><option value="banner">Banner</option>
@@ -63,8 +63,9 @@ export default function ManualGameUploadPanel({ game, assets, onRegistered }) {
     {error && <p role="alert" className="message message-error">{error}</p>}
     {message && <p role="status" className="message message-success">{message}</p>}
     {plan && <div aria-live="polite">
-      <h4>Instructions for {plan.game.title}</h4>
-      <dl>
+      <h4>Upload checklist · {plan.game.title}</h4>
+      <div className="upload-destination"><span>{plan.environment} · {plan.root.name}</span><strong>{plan.expectedFilename}</strong><button className="btn btn-secondary" type="button" onClick={async () => { try { await navigator.clipboard.writeText(plan.expectedFilename); setMessage('Filename copied'); } catch { setError('Copy unavailable. Select and copy the filename above.'); } }}>Copy filename</button></div>
+      <details className="game-advanced"><summary>File specifications and storage details</summary><dl>
         <dt>Game ID / slug</dt><dd>{plan.game.id} / {plan.game.slug}</dd>
         <dt>Environment</dt><dd><strong>{plan.environment}</strong></dd>
         <dt>Drive root</dt><dd>{plan.root.name} ({plan.rootVariable})</dd>
@@ -76,7 +77,7 @@ export default function ManualGameUploadPanel({ game, assets, onRegistered }) {
         <dt>Maximum size</dt><dd>{Math.round(plan.maxSize / (1024 * 1024))} MiB</dd>
         <dt>Application visibility</dt><dd>{plan.applicationVisibility}; public access still requires a published game</dd>
         <dt>Logical storage key (not a folder to create)</dt><dd><code>{plan.logicalStorageKey}</code></dd>
-      </dl>
+      </dl></details>
       <ol>
         <li><a href={plan.root.url} target="_blank" rel="noreferrer">Open this exact {plan.environment} Drive root</a>. Confirm the root name above.</li>
         <li>Upload the file directly into that root. Do not create a games/files/version subfolder for this binary.</li>

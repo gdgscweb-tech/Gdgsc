@@ -1,0 +1,34 @@
+.game-admin-workspace { color: #e8e8ed; }
+.game-admin-workspace [hidden] { display: none !important; }
+.game-editor-nav { position: sticky; top: 76px; z-index: 20; display: flex; gap: 6px; padding: 10px; margin: 18px 0; border: 1px solid #38383f; border-radius: 14px; background: #15151d; overflow-x: auto; }
+.game-editor-nav button { flex: 1; white-space: nowrap; padding: 12px 18px; border: 0; border-radius: 9px; color: #c5c5cf; background: transparent; font: inherit; cursor: pointer; }
+.game-editor-nav button[aria-current] { color: #141414; background: #ffd000; font-weight: 700; }
+.game-editor-nav button:disabled { opacity: .4; cursor: not-allowed; }
+.game-admin-workspace button:focus-visible, .game-admin-workspace summary:focus-visible, .game-admin-workspace a:focus-visible { outline: 2px solid #ffe46b; outline-offset: 4px; }
+.game-editor-context { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+.game-editor-context strong { color: white; font-size: 1.3rem; }
+.game-editor-context span { color: #c5c5cf; font-size: .9rem; }
+.game-admin-workspace .admin-editor-form { padding: clamp(18px,3vw,32px); }
+.game-admin-workspace .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; color: #dddde5; }
+.game-admin-workspace .admin-form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.game-admin-workspace p { line-height: 1.65; color: #bdbdc9; }
+.game-admin-workspace h3, .game-admin-workspace h4 { color: white; margin-bottom: 14px; }
+.game-advanced { padding: 16px; margin: 18px 0; border: 1px solid #45454e; border-radius: 10px; background: #18181f; }
+.game-advanced summary { cursor: pointer; color: #dddde5; font-weight: 600; }
+.game-advanced[open] summary { margin-bottom: 18px; }
+.game-publication > button { margin: 16px 0; }
+.game-publication li { color: #ffd76e; margin: 8px 0 8px 24px; }
+.game-publication button, .manual-upload-panel button { margin-right: 8px; }
+.game-publication .game-advanced button, .manual-upload-panel details button { padding: 10px 14px; border-radius: 8px; border: 1px solid #666; background: #2a2a34; color: white; font: inherit; cursor: pointer; }
+.manual-upload-panel a { color: #ffe16a; text-decoration: underline; }
+.manual-upload-panel ol { padding-left: 25px; margin: 24px 0; }
+.manual-upload-panel li { padding: 8px 0 8px 8px; line-height: 1.7; color: #e0e0e8; }
+.manual-upload-panel li::marker { color: #ffd000; font-weight: bold; }
+.manual-upload-panel code, .upload-destination strong { overflow-wrap: anywhere; user-select: all; }
+.manual-upload-panel dl { display: grid; grid-template-columns: minmax(120px,1fr) 2fr; gap: 12px 20px; font-size: .9rem; }
+.manual-upload-panel dt { color: #aaaab8; }
+.manual-upload-panel dd { margin: 0; color: #eeeef4; overflow-wrap: anywhere; }
+.upload-destination { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px; border: 1px solid #8d782b; border-radius: 12px; background: #232116; margin: 18px 0; }
+.upload-destination span { color: #ffe16a; text-transform: capitalize; }
+.upload-destination strong { color: white; }
+@media(max-width:700px) { .game-editor-nav { top: 64px; } .game-admin-workspace .admin-form-grid { grid-template-columns: 1fr; } .manual-upload-panel dl { grid-template-columns: 1fr; } .game-editor-nav button { padding: 10px 12px; } }
