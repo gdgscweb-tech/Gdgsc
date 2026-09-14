@@ -12,10 +12,10 @@ import './RecruitPage.css';
 const USS_OPTIONS = ['USAR', 'USDI', 'USAP', 'USMC'];
 
 const YEAR_OPTIONS = [
+  '2026-2030',
   '2025-2029',
   '2024-2028',
   '2023-2027',
-  '2022-2026',
   'Other',
 ];
 

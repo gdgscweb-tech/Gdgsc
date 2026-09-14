@@ -64,7 +64,7 @@ const RecruitmentSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Year is required'],
       enum: {
-        values: ['2025-2029', '2024-2028', '2023-2027', '2022-2026', 'Other'],
+        values: ['2026-2030', '2025-2029', '2024-2028', '2023-2027', '2022-2026', 'Other'],
         message: 'Year must be one of the provided batch options',
       },
     },
